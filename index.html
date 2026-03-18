@@ -10,40 +10,43 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Inline script to prevent FOUC (Flash of Unstyled Content)
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        document.documentElement.classList.remove('dark');
     </script>
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        /* Invo Style UI Refinements */
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
         .chart-container { position: relative; height: 300px; width: 100%; }
         
-        /* Senior UI/UX Refinements */
         .card-theme {
-            @apply bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/50 backdrop-blur-xl transition-all duration-300;
+            background: theme('colors.white');
+            border: 1px solid #F1F5F9;
+            border-radius: 1.5rem; /* rounded-2xl */
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
         }
-        
+        .card-theme:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
         .card-inner-theme {
-            @apply bg-slate-50/50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/50 transition-all duration-300;
+            @apply bg-slate-50/50 border border-slate-100 transition-all duration-300;
         }
 
         .text-theme-primary {
-            @apply text-slate-900 dark:text-white;
+            @apply text-slate-900;
         }
 
         .text-theme-secondary {
-            @apply text-slate-500 dark:text-slate-400;
+            @apply text-slate-500;
         }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { @apply bg-slate-200 dark:bg-slate-700 rounded-full; }
-        ::-webkit-scrollbar-thumb:hover { @apply bg-slate-300 dark:bg-slate-600; }
+        ::-webkit-scrollbar-thumb { @apply bg-slate-200 rounded-full; }
+        ::-webkit-scrollbar-thumb:hover { @apply bg-slate-300; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -52,7 +55,7 @@
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-600">
+<body class="bg-slate-50 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-600">
     <!-- Sidebar Container -->
     <div id="sidebar-container"></div>
 
@@ -62,24 +65,24 @@
         <!-- Header / Top Bar -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 fade-in" style="animation-delay: 0.1s;">
             <div class="space-y-1">
-                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Event Intelligence</h1>
-                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Monitoring real-time attendee analytics and insights.</p>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Event Intelligence</h1>
+                <p class="text-sm font-medium text-slate-900">Monitoring real-time attendee analytics and insights.</p>
             </div>
 
             <div class="flex items-center space-x-4 w-full md:w-auto">
                 <div class="relative group">
-                    <select id="eventSelector" class="appearance-none bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-3.5 pr-12 text-sm font-bold text-slate-700 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 shadow-sm transition-all cursor-pointer">
-                        <option value="all">ALL EVENTS</option>
+                    <select id="eventSelector" class="appearance-none bg-slate-100/50 border border-slate-200/60 rounded-xl px-5 py-3 pr-11 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0061FF]/10 focus:border-[#0061FF] shadow-sm transition-all cursor-pointer">
+                        <option value="all">All Events</option>
                     </select>
-                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-[#0061FF] transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
 
                 <div class="relative flex-grow md:flex-grow-0">
-                    <input type="text" placeholder="Search data..." class="w-full md:w-64 pl-12 pr-4 py-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-medium text-slate-700 dark:text-white shadow-sm">
+                    <input type="text" placeholder="Search data..." class="w-full md:w-60 pl-11 pr-4 py-3 bg-slate-100/50 border border-slate-200/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0061FF]/10 focus:border-[#0061FF] transition-all text-sm font-medium text-slate-700 shadow-sm placeholder-slate-400">
                     <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
                 </div>
             </div>
@@ -88,67 +91,83 @@
         <!-- KPI Cards Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 fade-in" style="animation-delay: 0.2s;">
             <!-- Total Attendees -->
-            <div class="card-theme p-7 rounded-[2.5rem] flex flex-col justify-between group hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/5 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4">
-                    <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-500">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <div class="card-theme p-6 flex flex-col justify-between group relative overflow-hidden">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-10 h-10 bg-[#0061FF]/10 rounded-xl flex items-center justify-center text-[#0061FF]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     </div>
+                    <p class="text-sm font-medium text-slate-500">Total Attendees</p>
                 </div>
-                <div class="space-y-1">
-                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Total Attendees</p>
-                    <h3 id="totalAttendees" class="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">0</h3>
+                <div class="flex items-baseline space-x-2">
+                    <h3 id="totalAttendees" class="text-3xl font-bold text-slate-900 tracking-tight leading-none">0</h3>
                 </div>
-                <div class="mt-6 flex items-center text-xs font-bold text-emerald-500">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    <span>+12% vs last month</span>
+                <div class="mt-4 flex items-center text-sm">
+                    <div class="flex items-center font-semibold text-[#22C55E]">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                        <span>+12%</span>
+                    </div>
+                    <span class="ml-2 text-slate-400 font-medium">from last month</span>
                 </div>
             </div>
 
             <!-- Today's Attendance -->
-            <div class="card-theme p-7 rounded-[2.5rem] flex flex-col justify-between group hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4">
-                    <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-500">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="card-theme p-6 flex flex-col justify-between group relative overflow-hidden">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-10 h-10 bg-[#0061FF]/10 rounded-xl flex items-center justify-center text-[#0061FF]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
+                    <p class="text-sm font-medium text-slate-500">Today's Attendance</p>
                 </div>
-                <div class="space-y-1">
-                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Today's Attendance</p>
-                    <h3 id="todayAttendance" class="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">0</h3>
+                <div class="flex items-baseline space-x-2">
+                    <h3 id="todayAttendance" class="text-3xl font-bold text-slate-900 tracking-tight leading-none">0</h3>
                 </div>
-                <div class="mt-6 flex items-center text-xs font-bold text-slate-500">
-                    <span class="opacity-60">Real-time update</span>
+                <div class="mt-4 flex items-center text-sm">
+                    <div class="flex items-center font-semibold text-[#0061FF]">
+                        <span class="relative flex h-2 w-2 mr-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0061FF] opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-[#0061FF]"></span>
+                        </span>
+                        <span>Live</span>
+                    </div>
+                    <span class="ml-2 text-slate-400 font-medium">real-time update</span>
                 </div>
             </div>
 
             <!-- Success Rate -->
-            <div class="card-theme p-7 rounded-[2.5rem] flex flex-col justify-between group hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/5 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4">
-                    <div class="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-500">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="card-theme p-6 flex flex-col justify-between group relative overflow-hidden">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-10 h-10 bg-[#0061FF]/10 rounded-xl flex items-center justify-center text-[#0061FF]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
+                    <p class="text-sm font-medium text-slate-500">Check-in Rate</p>
                 </div>
-                <div class="space-y-1">
-                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Check-in Rate</p>
-                    <h3 class="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">98%</h3>
+                <div class="flex items-baseline space-x-2">
+                    <h3 id="checkinRate" class="text-3xl font-bold text-slate-900 tracking-tight leading-none">0%</h3>
                 </div>
-                <div class="mt-6 flex items-center text-xs font-bold text-emerald-500">
-                    <span class="opacity-80">Highly Efficient</span>
+                <div class="mt-4 flex items-center text-sm">
+                    <div id="checkinRateBadge" class="flex items-center font-semibold text-[#22C55E]">
+                        <span id="checkinRateLabel">Optimal</span>
+                    </div>
+                    <span id="checkinRateSubtext" class="ml-2 text-slate-400 font-medium">highly efficient</span>
                 </div>
             </div>
 
             <!-- Peak Time -->
-            <div class="card-theme p-7 rounded-[2.5rem] flex flex-col justify-between group hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/5 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4">
-                    <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform duration-500">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <div class="card-theme p-6 flex flex-col justify-between group relative overflow-hidden">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-10 h-10 bg-[#0061FF]/10 rounded-xl flex items-center justify-center text-[#0061FF]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
+                    <p class="text-sm font-medium text-slate-500">Peak Hour</p>
                 </div>
-                <div class="space-y-1">
-                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Peak Hour</p>
-                    <h3 class="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">09:00</h3>
+                <div class="flex items-baseline space-x-2">
+                    <h3 id="peakHour" class="text-3xl font-bold text-slate-900 tracking-tight leading-none">--:--</h3>
                 </div>
-                <div class="mt-6 flex items-center text-xs font-bold text-amber-600">
-                    <span class="opacity-80">Morning Rush</span>
+                <div class="mt-4 flex items-center text-sm">
+                    <div id="peakHourBadge" class="flex items-center font-semibold text-[#F97316]">
+                        <span id="peakHourLabel">Surge</span>
+                    </div>
+                    <span id="peakHourSubtext" class="ml-2 text-slate-400 font-medium">morning rush</span>
                 </div>
             </div>
         </div>
@@ -158,11 +177,11 @@
             <!-- Sex / Gender Chart -->
             <div class="lg:col-span-4 card-theme p-8 rounded-[3rem] flex flex-col group">
                 <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center space-x-4 border-b border-slate-100 dark:border-slate-700/50 pb-2 flex-grow">
-                        <button id="tabSex" class="text-xs font-black uppercase tracking-[0.2em] text-white transition-all">Gender Distribution</button>
+                    <div class="flex items-center space-x-4 border-b border-slate-100 pb-2 flex-grow">
+                        <button id="tabSex" class="text-xs font-bold text-black transition-all">Gender Distribution</button>
                     </div>
                 </div>
-                <div class="chart-container flex-grow">
+                <div class="chart-container flex-grow bg-slate-50/50 rounded-3xl p-4 border border-slate-100/50">
                     <canvas id="sexGenderChart"></canvas>
                 </div>
             </div>
@@ -170,13 +189,13 @@
             <!-- Sectors Chart -->
             <div class="lg:col-span-8 card-theme p-8 rounded-[3rem] group">
                 <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">Sector Distribution</h3>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-3 h-3 rounded-full bg-blue-500"></span>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase">Monthly Data</span>
+                    <h3 class="text-sm font-bold text-black">Sector Distribution</h3>
+                    <div class="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Live Data</span>
                     </div>
                 </div>
-                <div class="chart-container">
+                <div class="chart-container bg-slate-50/50 rounded-3xl p-4 border border-slate-100/50">
                     <canvas id="sectorsChart"></canvas>
                 </div>
             </div>
@@ -185,37 +204,14 @@
         <!-- Lower Section -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 fade-in" style="animation-delay: 0.4s;">
              <!-- Top Agencies Chart -->
-             <div class="lg:col-span-5 card-theme p-8 rounded-[3rem]">
-                <h3 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-8">Agency Representation</h3>
-                <div class="chart-container">
+             <div class="lg:col-span-12 card-theme p-8 rounded-[3rem]">
+                <h3 class="text-sm font-bold text-black mb-8">Agency Representation</h3>
+                <div class="chart-container bg-slate-50/50 rounded-3xl p-4 border border-slate-100/50">
                     <canvas id="agenciesChart"></canvas>
                 </div>
             </div>
-
-            <!-- Spreadsheet Metadata -->
-            <div class="lg:col-span-7 card-theme p-8 rounded-[3rem] border-blue-500/5 transition-all duration-500">
-                <div class="flex justify-between items-center mb-8">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center">
-                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">System Schema</h2>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Sheets & Columns</p>
-                        </div>
-                    </div>
-                    <button id="refreshBtn" class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-[10px] font-black uppercase tracking-widest py-3 px-6 rounded-xl transition-all duration-300 cursor-pointer shadow-lg active:scale-95 flex items-center space-x-2 hover:opacity-90">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        <span>Refresh Schema</span>
-                    </button>
-                </div>
-                
-                <div id="metadataContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="w-full h-32 bg-slate-100 dark:bg-slate-700/50 rounded-2xl animate-pulse"></div>
-                    <div class="w-full h-32 bg-slate-100 dark:bg-slate-700/50 rounded-2xl animate-pulse"></div>
-                </div>
-            </div>
         </div>
+        <a href="test_notifications.html" class="text-blue-500 hover:underline">Test Notifications</a>
     </main>
 
     <script src="script.js"></script>
@@ -228,24 +224,66 @@
         function getRowVal(row, targetHeader) {
             if (!row) return null;
             const keys = Object.keys(row);
+            const target = String(targetHeader).toLowerCase().trim();
+
             // 1. Try exact match (case-insensitive)
-            let key = keys.find(k => k.toLowerCase() === targetHeader.toLowerCase());
+            let key = keys.find(k => k.toLowerCase().trim() === target);
             if (key) return row[key];
-            // 2. Try partial match
-            key = keys.find(k => k.toLowerCase().includes(targetHeader.toLowerCase()));
+
+            // 2. Try common alternatives for "Event"
+            if (target === 'event') {
+                const alternatives = ['description/title', 'event name', 'description', 'title'];
+                for (const alt of alternatives) {
+                    key = keys.find(k => k.toLowerCase().trim() === alt);
+                    if (key) return row[key];
+                }
+            }
+
+            // 3. Last resort: partial match, but exclude ID columns if we're not looking for an ID
+            key = keys.find(k => {
+                const lowK = k.toLowerCase();
+                if (!target.includes('id') && lowK.includes('id')) return false;
+                return lowK.includes(target);
+            });
+            
             return key ? row[key] : null;
+        }
+
+        function normalizeText(val) {
+            return String(val || "").trim().replace(/\s+/g, " ").toLowerCase();
+        }
+
+        function getAttendanceEventName(row) {
+            return getRowVal(row, "Event") || getRowVal(row, "Description/Title") || getRowVal(row, "Event Name") || getRowVal(row, "Description") || getRowVal(row, "Title") || "";
         }
 
         // Fetch and Display Data for Dashboard
         async function loadDashboardData() {
             try {
+                console.log("Fetching Attendance Form data...");
                 const data = await getFullSheetData("Attendance Form");
-                if (!data || !data.data) {
-                    console.error("No data returned from GAS");
+                
+                if (!data) {
+                    console.error("getFullSheetData returned null");
+                    NotificationSystem.show("Cannot connect to spreadsheet", "error");
                     return;
                 }
 
-                attendanceData = data.data;
+                if (!data.data || data.data.length === 0) {
+                    console.warn("Attendance Form has no data rows");
+                    NotificationSystem.show("No records found in Attendance Form", "warning");
+                    attendanceData = [];
+                    refreshDashboardUI([]);
+                    return;
+                }
+
+                const isNonEmptyValue = (v) => {
+                    if (v === null || v === undefined) return false;
+                    if (typeof v === 'string') return v.trim() !== '';
+                    return v !== '';
+                };
+                attendanceData = data.data.filter(r => Object.values(r).some(isNonEmptyValue));
+                console.log(`Loaded ${attendanceData.length} valid rows out of ${data.data.length}`);
                 
                 // Populate Events Dynamically
                 await loadDynamicEvents(attendanceData);
@@ -254,7 +292,7 @@
                 refreshDashboardUI(attendanceData);
             } catch (err) {
                 console.error("Dashboard Load Error:", err);
-                NotificationSystem.show("Error loading dashboard data", "error");
+                NotificationSystem.show("Failed to load dashboard data", "error");
             }
         }
 
@@ -266,11 +304,120 @@
             const today = new Date().toLocaleDateString();
             const todayCount = rows.filter(r => {
                 const timestamp = getRowVal(r, "Timestamp");
-                const rowDate = timestamp ? new Date(timestamp).toLocaleDateString() : null;
+                if (!timestamp) return false;
+                const rowDate = new Date(timestamp).toLocaleDateString();
                 return rowDate === today;
             }).length;
             
             document.getElementById('todayAttendance').innerText = todayCount;
+
+            const checkinEl = document.getElementById('checkinRate');
+            const checkinBadgeEl = document.getElementById('checkinRateBadge');
+            const checkinLabelEl = document.getElementById('checkinRateLabel');
+            const checkinSubtextEl = document.getElementById('checkinRateSubtext');
+
+            const peakHourEl = document.getElementById('peakHour');
+            const peakHourBadgeEl = document.getElementById('peakHourBadge');
+            const peakHourLabelEl = document.getElementById('peakHourLabel');
+            const peakHourSubtextEl = document.getElementById('peakHourSubtext');
+
+            const safeSetText = (el, text) => {
+                if (!el) return;
+                el.textContent = text;
+            };
+            const safeSetClass = (el, className) => {
+                if (!el) return;
+                el.className = className;
+            };
+
+            const getStatus = (r) => String(getRowVal(r, "Status") || getRowVal(r, "Attendance Status") || "").trim().toLowerCase();
+            const isCheckedIn = (r) => {
+                const status = getStatus(r);
+                if (!status) return true;
+                if (status === 'absent') return false;
+                return true;
+            };
+
+            const total = rows.length;
+            const checkedIn = rows.filter(isCheckedIn).length;
+            const rate = total > 0 ? Math.round((checkedIn / total) * 100) : 0;
+            safeSetText(checkinEl, `${rate}%`);
+
+            if (rate >= 95) {
+                safeSetClass(checkinBadgeEl, 'flex items-center font-semibold text-[#22C55E]');
+                safeSetText(checkinLabelEl, 'Optimal');
+                safeSetText(checkinSubtextEl, 'highly efficient');
+            } else if (rate >= 80) {
+                safeSetClass(checkinBadgeEl, 'flex items-center font-semibold text-[#0061FF]');
+                safeSetText(checkinLabelEl, 'Healthy');
+                safeSetText(checkinSubtextEl, 'running smoothly');
+            } else if (total === 0) {
+                safeSetClass(checkinBadgeEl, 'flex items-center font-semibold text-slate-400');
+                safeSetText(checkinLabelEl, 'No data');
+                safeSetText(checkinSubtextEl, 'waiting for records');
+            } else {
+                safeSetClass(checkinBadgeEl, 'flex items-center font-semibold text-[#F97316]');
+                safeSetText(checkinLabelEl, 'Needs review');
+                safeSetText(checkinSubtextEl, 'check absences');
+            }
+
+            const hourCounts = new Map();
+            rows.forEach(r => {
+                const ts = getRowVal(r, "Timestamp");
+                if (!ts) return;
+                const d = new Date(ts);
+                if (Number.isNaN(d.getTime())) return;
+                const hour = d.getHours();
+                hourCounts.set(hour, (hourCounts.get(hour) || 0) + 1);
+            });
+
+            if (hourCounts.size === 0) {
+                safeSetText(peakHourEl, '--:--');
+                safeSetClass(peakHourBadgeEl, 'flex items-center font-semibold text-slate-400');
+                safeSetText(peakHourLabelEl, 'No data');
+                safeSetText(peakHourSubtextEl, 'no timestamps');
+            } else {
+                let bestHour = 0;
+                let bestCount = -1;
+                for (const [h, c] of hourCounts.entries()) {
+                    if (c > bestCount) {
+                        bestCount = c;
+                        bestHour = h;
+                    }
+                }
+
+                const hourLabel = `${String(bestHour).padStart(2, '0')}:00`;
+                safeSetText(peakHourEl, hourLabel);
+
+                const totalWithTimestamp = Array.from(hourCounts.values()).reduce((a, b) => a + b, 0);
+                const avg = totalWithTimestamp / Math.max(hourCounts.size, 1);
+                const ratio = avg > 0 ? bestCount / avg : 0;
+
+                let tag = 'Normal';
+                let badgeClass = 'flex items-center font-semibold text-[#0061FF]';
+                if (ratio >= 1.5) {
+                    tag = 'Surge';
+                    badgeClass = 'flex items-center font-semibold text-[#F97316]';
+                } else if (ratio >= 1.15) {
+                    tag = 'Busy';
+                    badgeClass = 'flex items-center font-semibold text-[#0061FF]';
+                } else {
+                    tag = 'Steady';
+                    badgeClass = 'flex items-center font-semibold text-[#22C55E]';
+                }
+
+                safeSetClass(peakHourBadgeEl, badgeClass);
+                safeSetText(peakHourLabelEl, tag);
+
+                const timeOfDay = bestHour >= 5 && bestHour < 12
+                    ? 'morning'
+                    : bestHour >= 12 && bestHour < 17
+                        ? 'afternoon'
+                        : bestHour >= 17 && bestHour < 22
+                            ? 'evening'
+                            : 'late night';
+                safeSetText(peakHourSubtextEl, `${timeOfDay} peak`);
+            }
 
             updateCharts(rows);
         }
@@ -278,65 +425,74 @@
         async function loadDynamicEvents(rows) {
             const eventSelector = document.getElementById('eventSelector');
             const metadata = await getSheetMetadata();
-            let events = [];
+            const attendanceEventMap = new Map();
 
-            // 1. Check if there's an "Events" sheet
+            rows.forEach(r => {
+                const name = String(getAttendanceEventName(r) || "").trim();
+                const key = normalizeText(name);
+                if (!key) return;
+                if (!attendanceEventMap.has(key)) {
+                    attendanceEventMap.set(key, { name, count: 0 });
+                }
+                attendanceEventMap.get(key).count += 1;
+            });
+
+            const optionMap = new Map(attendanceEventMap);
+
             if (metadata && metadata["Events"]) {
                 const eventData = await getFullSheetData("Events");
                 if (eventData && eventData.data) {
-                    events = eventData.data.map(r => {
-                        const title = getRowVal(r, "Description/Title") || getRowVal(r, "Event Name") || getRowVal(r, "Description");
-                        if (title) return title;
-                        
-                        const fallbackKey = Object.keys(r).find(k => {
-                            const lowK = k.toLowerCase();
-                            return !lowK.includes('id') && !lowK.includes('date') && !lowK.includes('timestamp');
-                        });
-                        return fallbackKey ? r[fallbackKey] : r[Object.keys(r)[0]];
-                    }).filter(Boolean);
+                    eventData.data.forEach(r => {
+                        const name = String(getRowVal(r, "Description/Title") || getRowVal(r, "Event Name") || getRowVal(r, "Description") || getRowVal(r, "Title") || "").trim();
+                        const key = normalizeText(name);
+                        if (!key) return;
+                        if (!optionMap.has(key)) {
+                            optionMap.set(key, { name, count: 0 });
+                        }
+                    });
                 }
             }
 
-            // 2. Fallback: Get unique events from Attendance Form
-            if (events.length === 0) {
-                events = [...new Set(rows.map(r => {
-                    const title = getRowVal(r, "Description/Title") || getRowVal(r, "Event Name") || getRowVal(r, "Description") || getRowVal(r, "Event");
-                    return title;
-                }).filter(Boolean))];
-            }
-            
-            const currentValue = eventSelector.value;
-            eventSelector.innerHTML = '<option value="all">ALL EVENTS</option>';
-            const uniqueEvents = [...new Set(events)].sort();
+            const options = [...optionMap.entries()]
+                .sort((a, b) => a[1].name.localeCompare(b[1].name));
+            console.log("Event options:", options);
 
-            uniqueEvents.forEach(event => {
+            eventSelector.innerHTML = '<option value="all">All Events</option>';
+
+            options.forEach(([key, meta]) => {
                 const option = document.createElement('option');
-                option.value = event;
-                option.textContent = String(event).toUpperCase();
+                option.value = key;
+                option.textContent = `${meta.name}${meta.count > 0 ? ` (${meta.count})` : ''}`;
                 eventSelector.appendChild(option);
             });
-
-            if (uniqueEvents.includes(currentValue)) {
-                eventSelector.value = currentValue;
-            }
         }
 
         // Handle event selection change
         document.getElementById('eventSelector').addEventListener('change', function() {
             const selectedEvent = this.value;
-            console.log("Filtering by event:", selectedEvent);
+            console.log("Event selector changed to:", selectedEvent);
             
             let filteredRows = attendanceData;
             
             if (selectedEvent !== 'all') {
+                const target = normalizeText(selectedEvent);
+
                 filteredRows = attendanceData.filter(r => {
-                    const rowEvent = getRowVal(r, "Description/Title") || getRowVal(r, "Description") || getRowVal(r, "Event Name") || getRowVal(r, "Event");
-                    return String(rowEvent) === String(selectedEvent);
+                    const rowEvent = normalizeText(getAttendanceEventName(r));
+                    return rowEvent === target;
                 });
             }
 
+            console.log(`Filtered Result: ${filteredRows.length} matches for "${selectedEvent}"`);
             refreshDashboardUI(filteredRows);
-            NotificationSystem.show(`Filtered by: ${selectedEvent === 'all' ? 'All Events' : selectedEvent}`, 'info');
+            
+            if (selectedEvent !== 'all') {
+                if (filteredRows.length === 0) {
+                    NotificationSystem.show(`Walang nahanap na data para sa "${selectedEvent}"`, "warning");
+                } else {
+                    NotificationSystem.show(`Found ${filteredRows.length} records`, "success");
+                }
+            }
         });
 
         function updateCharts(rows) {
@@ -517,49 +673,8 @@
             });
         }
 
-        // Fetch and Display Metadata
-        async function displayMetadata() {
-            const container = document.getElementById('metadataContainer');
-            container.innerHTML = `
-                <div class="w-full h-32 bg-slate-100 dark:bg-slate-700/50 rounded-2xl animate-pulse"></div>
-                <div class="w-full h-32 bg-slate-100 dark:bg-slate-700/50 rounded-2xl animate-pulse"></div>
-            `;
-            
-            const metadata = await getSheetMetadata();
-            if (!metadata) {
-                container.innerHTML = '<p class="text-red-500 text-center font-medium col-span-full py-12">Failed to load metadata.</p>';
-                return;
-            }
-
-            container.innerHTML = '';
-            for (const [sheetName, columns] of Object.entries(metadata)) {
-                const sheetDiv = document.createElement('div');
-                sheetDiv.className = 'card-inner-theme rounded-[2rem] p-6 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/5 group border border-transparent hover:border-blue-500/20 fade-in';
-                sheetDiv.innerHTML = `
-                    <h3 class="font-black text-sm text-slate-900 dark:text-white mb-4 flex items-center group-hover:translate-x-1 transition-transform duration-300 uppercase tracking-widest">
-                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-lg shadow-blue-500/20">
-                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path></svg>
-                        </div>
-                        ${sheetName}
-                    </h3>
-                    <div class="flex flex-wrap gap-2">
-                        ${columns.length > 0 
-                            ? columns.map(col => `<span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-tight shadow-sm transition-all hover:border-blue-500 hover:text-blue-600">${col}</span>`).join('')
-                            : '<span class="text-slate-400 text-[10px] italic font-bold uppercase">No columns found</span>'
-                        }
-                    </div>
-                `;
-                container.appendChild(sheetDiv);
-            }
-        }
-
         // Initialize
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            displayMetadata();
-            loadDashboardData();
-        });
         window.addEventListener('DOMContentLoaded', () => {
-            displayMetadata();
             loadDashboardData();
         });
     </script>

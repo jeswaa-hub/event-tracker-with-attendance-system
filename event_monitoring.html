@@ -8,11 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script>
         // Inline script to prevent FOUC (Flash of Unstyled Content)
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        // Dark mode disabled
+        document.documentElement.classList.remove('dark');
     </script>
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -24,7 +21,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-600">
+<body class="bg-slate-50 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-600">
     <!-- Sidebar Container -->
     <div id="sidebar-container"></div>
 
@@ -35,24 +32,24 @@
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 animate-[fadeIn_0.5s_ease-out_forwards] opacity-0" style="animation-delay: 0.1s;">
                 <div class="space-y-2">
-                    <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Event Monitoring</h1>
-                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Manage and track your active events</p>
+                    <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Event Monitoring</h1>
+                    <p class="text-sm font-bold text-slate-500">Manage and track your active events</p>
                 </div>
                 
-                <button id="addEventBtn" class="bg-[#155DFC] hover:bg-[#1048c7] text-white text-[10px] font-black uppercase tracking-widest py-4 px-10 rounded-2xl transition-all duration-300 shadow-2xl shadow-blue-500/20 active:scale-95 flex items-center space-x-3">
+                <button id="addEventBtn" class="bg-[#155DFC] hover:bg-[#1048c7] text-white text-[10px] font-bold py-4 px-10 rounded-2xl transition-all duration-300 shadow-2xl shadow-blue-500/20 active:scale-95 flex items-center space-x-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     <span>Create New Event</span>
                 </button>
             </div>
 
             <!-- Events Table -->
-            <div class="bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/50 backdrop-blur-xl transition-all duration-300 rounded-[3rem] shadow-2xl shadow-slate-200/50 dark:shadow-none overflow-hidden animate-[fadeIn_0.5s_ease-out_forwards] opacity-0" style="animation-delay: 0.2s;">
+            <div class="bg-white border border-slate-200/60 backdrop-blur-xl transition-all duration-300 rounded-[3rem] shadow-2xl shadow-slate-200/50 overflow-hidden animate-[fadeIn_0.5s_ease-out_forwards] opacity-0" style="animation-delay: 0.2s;">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead id="eventsTableHead">
                             <!-- Headers will be injected here -->
                         </thead>
-                        <tbody id="eventsTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/50">
+                        <tbody id="eventsTableBody" class="divide-y divide-slate-100">
                             <!-- Events will be loaded here -->
                         </tbody>
                     </table>
@@ -63,13 +60,13 @@
 
     <!-- Create Event Modal -->
     <div id="createEventModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto transition-all duration-500 hidden opacity-0">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] shadow-2xl p-10 space-y-8 transform scale-95 transition-all duration-300 relative my-auto border border-slate-100 dark:border-slate-800">
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-10 space-y-8 transform scale-95 transition-all duration-300 relative my-auto border border-slate-100">
             <div class="flex justify-between items-center">
                 <div class="space-y-1">
-                    <h2 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Create New Event</h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Enter the details for the new record</p>
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Create New Event</h2>
+                    <p class="text-[10px] font-bold text-slate-400">Enter the details for the new record</p>
                 </div>
-                <button onclick="closeCreateModal()" class="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <button onclick="closeCreateModal()" class="p-3 hover:bg-slate-100 rounded-2xl transition-all text-slate-400 hover:text-slate-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -80,8 +77,8 @@
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                    <button type="button" onclick="closeCreateModal()" class="flex-1 px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-800">Cancel</button>
-                    <button type="submit" id="saveEventBtn" class="flex-[2] bg-[#155DFC] hover:bg-[#1048c7] text-white text-[10px] font-black uppercase tracking-widest py-5 rounded-2xl transition-all duration-300 shadow-xl shadow-blue-500/20 active:scale-95 flex items-center justify-center space-x-3">
+                    <button type="button" onclick="closeCreateModal()" class="flex-1 px-8 py-5 rounded-2xl text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-all border border-slate-100">Cancel</button>
+                    <button type="submit" id="saveEventBtn" class="flex-[2] bg-[#155DFC] hover:bg-[#1048c7] text-white text-[10px] font-bold py-5 rounded-2xl transition-all duration-300 shadow-xl shadow-blue-500/20 active:scale-95 flex items-center justify-center space-x-3">
                         <span>Save Event</span>
                         <div id="saveBtnLoader" class="hidden">
                             <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -94,63 +91,60 @@
 
     <!-- Check-in QR Modal -->
     <div id="checkinModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto transition-all duration-500 hidden opacity-0">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 space-y-8 transform scale-95 transition-all duration-300 relative my-auto border border-slate-100 dark:border-slate-800">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 space-y-8 transform scale-95 transition-all duration-300 relative my-auto border border-slate-100">
             <div class="flex justify-between items-center">
                 <div class="space-y-1">
-                    <h2 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Event Check-in</h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Share this QR or Link with attendees</p>
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Event Check-in</h2>
+                    <p class="text-[10px] font-bold text-slate-400">Share this QR or Link with attendees</p>
                 </div>
-                <button onclick="closeCheckinModal()" class="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <button onclick="closeCheckinModal()" class="p-3 hover:bg-slate-100 rounded-2xl transition-all text-slate-400 hover:text-slate-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <div class="flex flex-col items-center space-y-8 py-4">
-                <!-- QR Code Container -->
-                <div id="qrcode" class="p-6 bg-white rounded-3xl border-4 border-slate-50 shadow-inner min-w-[200px] min-h-[200px] flex items-center justify-center">
-                    <!-- QR will be generated here -->
+            <div class="space-y-6">
+                <div class="flex flex-col items-center space-y-4 p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                    <div id="checkinQR" class="w-48 h-48 bg-white p-4 rounded-2xl shadow-sm border border-slate-100"></div>
+                    <p class="text-[10px] font-bold text-slate-400">Scan to check-in</p>
                 </div>
 
-                <div class="w-full space-y-4">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Direct Link</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="checkinLinkInput" readonly class="flex-1 px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-500 overflow-hidden">
-                            <button onclick="copyCheckinLink()" class="p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-all active:scale-90">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                            </button>
-                        </div>
+                <div class="space-y-3">
+                    <label class="text-[10px] font-bold text-slate-400 ml-1">Direct Link</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="checkinLink" readonly class="flex-grow bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-xs font-medium text-slate-600 focus:outline-none">
+                        <button onclick="copyCheckinLink()" class="p-4 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <button onclick="closeCheckinModal()" class="w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-800">Close</button>
+            <button onclick="closeCheckinModal()" class="w-full py-5 rounded-2xl text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-all border border-slate-100">Close</button>
         </div>
     </div>
 
     <!-- Edit Event Modal -->
     <div id="editEventModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto transition-all duration-500 hidden opacity-0">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] shadow-2xl p-10 space-y-8 transform scale-95 transition-all duration-300 relative my-auto border border-slate-100 dark:border-slate-800">
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-10 space-y-8 transform scale-95 transition-all duration-300 relative my-auto border border-slate-100">
             <div class="flex justify-between items-center">
                 <div class="space-y-1">
-                    <h2 class="text-2xl font-black text-blue-600 dark:text-blue-400 uppercase tracking-tight">Edit Event Details</h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Modify existing event information</p>
+                    <h2 class="text-2xl font-bold text-blue-600 tracking-tight">Edit Event Details</h2>
+                    <p class="text-[10px] font-bold text-slate-400">Update the existing record information</p>
                 </div>
-                <button onclick="closeEditModal()" class="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <button onclick="closeEditModal()" class="p-3 hover:bg-slate-100 rounded-2xl transition-all text-slate-400 hover:text-slate-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
             <form id="editEventForm" class="space-y-6">
-                <input type="hidden" id="editEventId">
                 <div id="editFormFields" class="space-y-6">
                     <!-- Dynamic fields for edit -->
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                    <button type="button" onclick="closeEditModal()" class="flex-1 px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-800">Cancel</button>
-                    <button type="submit" id="updateEventBtn" class="flex-[2] bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest py-5 rounded-2xl transition-all duration-300 shadow-xl shadow-blue-500/20 active:scale-95 flex items-center justify-center space-x-3">
-                        <span>Update Changes</span>
+                    <button type="button" onclick="closeEditModal()" class="flex-1 px-8 py-5 rounded-2xl text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-all border border-slate-100">Cancel</button>
+                    <button type="submit" id="updateEventBtn" class="flex-[2] bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-5 rounded-2xl transition-all duration-300 shadow-xl shadow-blue-500/20 active:scale-95 flex items-center justify-center space-x-3">
+                        <span>Update Event</span>
                         <div id="updateBtnLoader" class="hidden">
                             <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         </div>
@@ -162,24 +156,25 @@
 
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[110] flex items-center justify-center p-4 transition-all duration-500 hidden opacity-0">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] shadow-2xl p-10 space-y-8 transform scale-95 transition-all duration-300 text-center border border-slate-100 dark:border-slate-800">
-            <div class="w-20 h-20 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto text-red-600 dark:text-red-400">
+        <div class="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl p-10 space-y-8 transform scale-95 transition-all duration-300 text-center border border-slate-100">
+            <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto text-red-600">
                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </div>
             
             <div class="space-y-2">
-                <h2 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Are you sure?</h2>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-relaxed">This action cannot be undone. This will permanently delete the event.</p>
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Are you sure?</h2>
+                <p class="text-xs font-bold text-slate-400 leading-relaxed">This action cannot be undone. This will permanently delete the event.</p>
             </div>
 
-            <div class="flex flex-col gap-3">
-                <button id="confirmDeleteBtn" class="w-full bg-red-600 hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-widest py-5 rounded-2xl transition-all duration-300 shadow-xl shadow-red-500/20 active:scale-95 flex items-center justify-center space-x-3">
-                    <span>Delete Event</span>
+            <div class="space-y-3">
+                <button id="confirmDeleteBtn" class="w-full bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold py-5 rounded-2xl transition-all duration-300 shadow-xl shadow-red-500/20 active:scale-95 flex items-center justify-center space-x-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span>Confirm Delete</span>
                     <div id="deleteBtnLoader" class="hidden">
                         <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     </div>
                 </button>
-                <button onclick="closeDeleteModal()" class="w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-800">Cancel</button>
+                <button onclick="closeDeleteModal()" class="w-full py-5 rounded-2xl text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-all border border-slate-100">Cancel</button>
             </div>
         </div>
     </div>
@@ -207,13 +202,14 @@
             const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
             const checkinUrl = `${baseUrl}attendance_form.html?id=${id}`;
             
-            document.getElementById('checkinLinkInput').value = checkinUrl;
+            const linkInput = document.getElementById('checkinLink') || document.getElementById('checkinLinkInput');
+            if (linkInput) linkInput.value = checkinUrl;
             
-            // Generate QR Code
             const qr = qrcode(0, 'M');
             qr.addData(checkinUrl);
             qr.make();
-            document.getElementById('qrcode').innerHTML = qr.createImgTag(6);
+            const qrContainer = document.getElementById('checkinQR') || document.getElementById('qrcode');
+            if (qrContainer) qrContainer.innerHTML = qr.createImgTag(6);
 
             checkinModal.classList.remove('hidden');
             setTimeout(() => {
@@ -229,7 +225,8 @@
         }
 
         window.copyCheckinLink = function() {
-            const input = document.getElementById('checkinLinkInput');
+            const input = document.getElementById('checkinLink') || document.getElementById('checkinLinkInput');
+            if (!input) return;
             input.select();
             document.execCommand('copy');
             NotificationSystem.show("Link copied to clipboard!", "success");
@@ -395,7 +392,7 @@
                     fieldDiv.className = 'space-y-2';
                     
                     let inputHtml = '';
-                    const commonClasses = "w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold text-slate-700 dark:text-white";
+                    const commonClasses = "w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold text-slate-700";
 
                     if (lowerCol === 'status') {
                         inputHtml = `<select name="${col}" class="${commonClasses} appearance-none"><option value="Upcoming">Upcoming</option><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option></select>`;
@@ -407,7 +404,7 @@
                         inputHtml = `<input type="text" name="${col}" required class="${commonClasses}">`;
                     }
 
-                    fieldDiv.innerHTML = `<label class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">${col}</label>${inputHtml}`;
+                    fieldDiv.innerHTML = `<label class="text-[10px] font-bold text-slate-400 ml-1">${col}</label>${inputHtml}`;
                     container.appendChild(fieldDiv);
                 });
             } catch (error) {
@@ -422,15 +419,20 @@
             try {
                 const response = await getFullSheetData(SHEET_NAME);
                 if (!response || response.status === "error") {
-                    tbody.innerHTML = `<tr><td colspan="10" class="py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">No events found</td></tr>`;
-                    return;
+                    tbody.innerHTML = `<tr><td colspan="10" class="py-20 text-center text-slate-400 font-bold text-xs">No events found</td></tr>`;
+                } else {
+                    const isNonEmptyValue = (v) => {
+                        if (v === null || v === undefined) return false;
+                        if (typeof v === 'string') return v.trim() !== '';
+                        return v !== '';
+                    };
+                    allEvents = response.data.filter(r => Object.values(r).some(isNonEmptyValue));
+                    if (eventSchema.length === 0) eventSchema = response.headers;
+                    renderEvents(allEvents);
                 }
-                allEvents = response.data;
-                if (eventSchema.length === 0) eventSchema = response.headers;
-                renderEvents(allEvents);
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="10" class="py-20 text-center text-red-500 font-bold uppercase tracking-widest text-xs">Error loading events</td></tr>`;
+            } catch (err) {
+                console.error("Error loading events:", err);
+                tbody.innerHTML = `<tr><td colspan="10" class="py-20 text-center text-red-500 font-bold text-xs">Error loading events</td></tr>`;
             }
         }
 
@@ -440,26 +442,26 @@
             
             if (eventSchema.length === 0) return;
 
-            thead.innerHTML = `<tr class="bg-slate-50/50 dark:bg-slate-800/50">${eventSchema.map(col => `<th class="px-8 py-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] border-b border-slate-100 dark:border-slate-700/50 whitespace-nowrap">${col}</th>`).join('')}<th class="px-8 py-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] border-b border-slate-100 dark:border-slate-700/50 whitespace-nowrap text-right">Actions</th></tr>`;
+            thead.innerHTML = `<tr class="bg-slate-50/50">${eventSchema.map(col => `<th class="px-8 py-6 text-[10px] font-bold text-slate-400 border-b border-slate-100 whitespace-nowrap">${col}</th>`).join('')}<th class="px-8 py-6 text-[10px] font-bold text-slate-400 border-b border-slate-100 whitespace-nowrap text-right">Actions</th></tr>`;
 
             tbody.innerHTML = events.map((event, index) => {
                 const idCol = eventSchema.find(c => c.toLowerCase().includes('id')) || eventSchema[0];
                 const id = String(event[idCol]).replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                return `<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-300 animate-[fadeIn_0.5s_ease-out_forwards] group" style="animation-delay: ${index * 30}ms; opacity: 0;">${eventSchema.map(col => {
+                return `<tr class="hover:bg-slate-50/80 transition-all duration-300 animate-[fadeIn_0.5s_ease-out_forwards] group" style="animation-delay: ${index * 30}ms; opacity: 0;">${eventSchema.map(col => {
                     const val = event[col] || "N/A";
                     const low = col.toLowerCase();
-                    if (low === 'status') return `<td class="px-8 py-5 whitespace-nowrap"><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${getStatusClass(val)}">${val}</span></td>`;
-                    if (low.includes('date')) return `<td class="px-8 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">${formatDateForDisplay(val)}</td>`;
-                    if (low.includes('id')) return `<td class="px-8 py-5 text-xs font-black text-blue-600 dark:text-blue-400 whitespace-nowrap uppercase tracking-tight">${val}</td>`;
-                    return `<td class="px-8 py-5 text-xs font-bold text-slate-900 dark:text-white whitespace-nowrap">${val}</td>`;
-                }).join('')}<td class="px-8 py-5 whitespace-nowrap text-right"><div class="flex items-center justify-end space-x-3"><button onclick="openCheckinModal('${id}')" class="p-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg hover:scale-110 transition-transform" title="Check-in QR/Link"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg></button><button onclick="handleEdit('${id}')" class="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:scale-110 transition-transform"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button><button onclick="openDeleteModal('${id}')" class="p-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:scale-110 transition-transform"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div></td></tr>`;
+                    if (low === 'status') return `<td class="px-8 py-5 whitespace-nowrap"><span class="px-3 py-1 rounded-full text-[10px] font-bold ${getStatusClass(val)}">${val}</span></td>`;
+                    if (low.includes('date')) return `<td class="px-8 py-5 text-xs font-bold text-slate-500 whitespace-nowrap">${formatDateForDisplay(val)}</td>`;
+                    if (low.includes('id')) return `<td class="px-8 py-5 text-xs font-bold text-blue-600 whitespace-nowrap">${val}</td>`;
+                    return `<td class="px-8 py-5 text-xs font-bold text-slate-900 whitespace-nowrap">${val}</td>`;
+                }).join('')}<td class="px-8 py-5 whitespace-nowrap text-right"><div class="flex items-center justify-end space-x-3"><button onclick="openCheckinModal('${id}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:scale-110 transition-transform" title="Check-in QR/Link"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg></button><button onclick="handleEdit('${id}')" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:scale-110 transition-transform"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button><button onclick="openDeleteModal('${id}')" class="p-2 bg-red-50 text-red-600 rounded-lg hover:scale-110 transition-transform"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div></td></tr>`;
             }).join('');
         }
 
         function getStatusClass(s) {
-            if (s === 'Upcoming') return 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400';
-            if (s === 'Ongoing') return 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400';
-            if (s === 'Completed') return 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-500';
+            if (s === 'Upcoming') return 'bg-blue-50 text-blue-600';
+            if (s === 'Ongoing') return 'bg-emerald-50 text-emerald-600';
+            if (s === 'Completed') return 'bg-slate-100 text-slate-500';
             return 'bg-slate-50 text-slate-400';
         }
 

@@ -113,7 +113,7 @@
                 <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto text-white">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h2 class="text-3xl font-black text-slate-900">Check-in Successful!</h2>
+                <h2 class="text-3xl font-bold text-slate-900">Check-in Successful!</h2>
                 <p class="text-slate-500 font-bold">Thank you for attending. Your attendance has been recorded.</p>
                 <button onclick="window.location.reload()" class="text-blue-600 font-bold hover:underline">Submit another response</button>
             </div>
@@ -127,6 +127,7 @@
         const eventId = urlParams.get('id');
         const SHEET_NAME = "Attendance Form";
         let eventName = "";
+        let attendanceSchema = [];
 
         function getRowVal(row, targetHeader) {
             if (!row) return null;
@@ -189,7 +190,11 @@
                 document.getElementById('checkinForm').classList.remove('hidden');
 
                 const attendanceResponse = await getFullSheetData(SHEET_NAME);
-                const schema = attendanceResponse.headers;
+                if (attendanceResponse) {
+                    attendanceSchema = attendanceResponse.headers;
+                }
+                
+                const schema = attendanceSchema;
                 
                 const personalGrid = document.getElementById('personalInfoGrid');
                 const addressGrid = document.getElementById('addressGrid');
@@ -249,9 +254,7 @@
                                 '13 - Caraga Region',
                                 'BARMM - Bangsamoro Autonomous Region in Muslim Mindanao'
                             ].forEach(opt => {
-                                // For NCR, the photo shows it without quotes
-                                const label = opt === 'NCR - National Capital Region' ? opt : opt;
-                                select.add(new Option(label, label));
+                                select.add(new Option(opt, opt));
                             });
                         } else if (low === 'industry') {
                             ['LGU', 'National Government Agency', 'State University College', 'Private', 'Self Employed', 'None'].forEach(opt => select.add(new Option(opt, opt)));
@@ -323,8 +326,13 @@
         document.getElementById('checkinForm').onsubmit = async (e) => {
             e.preventDefault();
             
+            if (!eventId) {
+                NotificationSystem.show("Missing Event ID. Please use a valid check-in link.", "error");
+                return;
+            }
+
             if (isCanvasBlank(document.getElementById('signaturePad'))) {
-                alert("Please provide your signature.");
+                NotificationSystem.show("Please provide your signature.", "warning");
                 return;
             }
 
@@ -336,10 +344,20 @@
             const payload = { 
                 action: "create", 
                 sheetName: SHEET_NAME,
-                Timestamp: new Date().toISOString(),
+                "Event ID": eventId,
                 Event: eventName,
+                Timestamp: new Date().toISOString(),
                 Signature: canvas.toDataURL('image/png')
             };
+
+            // Smart mapping for Event, Timestamp, and Signature based on actual sheet headers
+            attendanceSchema.forEach(header => {
+                const h = header.toLowerCase();
+                if (h.includes('timestamp')) payload[header] = new Date().toISOString();
+                else if (h.includes('signature')) payload[header] = canvas.toDataURL('image/png');
+                else if (h === 'event' || h.includes('description') || h.includes('title')) payload[header] = eventName;
+                else if (h === 'event id' || h === 'eventid') payload[header] = eventId;
+            });
 
             new FormData(e.target).forEach((val, key) => payload[key] = val);
 
@@ -349,12 +367,12 @@
                     document.getElementById('checkinForm').classList.add('hidden');
                     document.getElementById('successView').classList.remove('hidden');
                 } else {
-                    alert("Error: " + res.message);
+                    NotificationSystem.show("Error: " + res.message, "error");
                     btn.disabled = false;
                     loader.classList.add('hidden');
                 }
             } catch (err) {
-                alert("Submission failed.");
+                NotificationSystem.show("Submission failed.", "error");
                 btn.disabled = false;
                 loader.classList.add('hidden');
             }

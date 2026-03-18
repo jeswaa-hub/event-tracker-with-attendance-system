@@ -16,61 +16,51 @@ const SidebarComponent = {
         ];
 
         const html = `
-            <aside id="sidebar" class="fixed left-0 top-0 h-screen w-72 bg-[#155DFC] text-white flex flex-col transition-all duration-300 z-50 transform -translate-x-full lg:translate-x-0 shadow-2xl overflow-hidden">
-                <!-- Logo Header -->
-                <div class="p-8 flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-800/20">
-                        <svg class="w-6 h-6 text-[#155DFC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <!-- Mobile Menu Overlay -->
+            <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+
+            <!-- Sidebar -->
+            <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-100 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+                
+                <!-- Logo Section -->
+                <div class="h-24 flex items-center px-8 border-b border-slate-50">
+                    <div class="flex items-center space-x-3 group cursor-pointer">
+                        <div class="w-10 h-10 bg-[#0061FF] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#0061FF]/30 group-hover:scale-105 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold tracking-tight text-slate-900">Event Tracker</span>
                     </div>
-                    <span class="text-2xl font-black tracking-tighter uppercase text-white">Tracker</span>
                 </div>
 
                 <!-- Navigation Links -->
-                <nav class="flex-grow px-4 mt-6 space-y-2 overflow-y-auto">
+                <nav class="flex-grow px-6 mt-8 space-y-2 overflow-y-auto">
                     ${menuItems.map(item => `
                         <a href="${item.link}" 
-                           class="flex items-center space-x-4 px-6 py-4 rounded-2xl transition-all duration-200 group hover:bg-white/10 ${currentPage === item.link ? 'bg-white text-[#155DFC] font-bold shadow-xl shadow-blue-900/10' : 'text-white/90 hover:text-white'}"
+                           class="flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-300 group ${currentPage === item.link ? 'bg-[#0061FF] text-white shadow-md shadow-[#0061FF]/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium'}"
                            aria-label="${item.label}">
-                            <div class="w-6 h-6 ${currentPage === item.link ? 'text-[#155DFC]' : 'text-white/80 group-hover:text-white transition-colors'}">
+                            <div class="w-5 h-5 ${currentPage === item.link ? 'text-white' : 'text-slate-400 group-hover:text-[#0061FF] transition-colors'}">
                                 ${item.icon}
                             </div>
-                            <span class="text-sm font-semibold tracking-tight">${item.label}</span>
+                            <span class="text-[15px] ${currentPage === item.link ? 'font-semibold' : ''}">${item.label}</span>
                         </a>
                     `).join('')}
                 </nav>
 
                 <!-- Footer Section -->
-                <div class="p-6 space-y-4 bg-blue-700/20 backdrop-blur-md">
-                    <!-- Dark Mode Toggle -->
-                    <div class="flex items-center justify-between px-6 py-4 rounded-2xl bg-white/10">
-                        <div class="flex items-center space-x-4">
-                            <div id="dark-mode-icon" class="text-white">
-                                ${this.icons.moon}
-                            </div>
-                            <span class="text-sm font-bold tracking-tight text-white">Dark Mode</span>
-                        </div>
-                        <button id="dark-mode-toggle" 
-                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/20"
-                                role="switch" aria-checked="false">
-                            <span class="sr-only">Toggle Dark Mode</span>
-                            <span id="dark-mode-dot" class="inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300 translate-x-1"></span>
-                        </button>
-                    </div>
-
+                <div class="p-6 border-t border-slate-50">
                     <!-- Logout Button -->
                     <button id="logout-btn" 
-                            class="w-full flex items-center justify-center space-x-3 px-6 py-4 rounded-2xl bg-white text-[#155DFC] font-black shadow-xl hover:bg-gray-50 active:scale-95 transition-all duration-200"
+                            class="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl bg-slate-50 text-slate-600 font-medium hover:bg-red-50 hover:text-red-600 active:scale-95 transition-all duration-200 group"
                             aria-label="Logout">
-                        <div class="w-5 h-5">
+                        <div class="w-5 h-5 text-slate-400 group-hover:text-red-500 transition-colors">
                             ${this.icons.logout}
                         </div>
-                        <span class="text-sm uppercase tracking-widest">Logout</span>
+                        <span class="text-[15px]">Logout</span>
                     </button>
                 </div>
             </aside>
-
-            <!-- Mobile Toggle Overlay -->
-            <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300 opacity-0"></div>
             
             <!-- Mobile Menu Button -->
             <button id="mobile-menu-btn" class="fixed top-6 left-6 z-50 p-3 bg-white text-[#155DFC] rounded-xl shadow-lg lg:hidden hover:bg-gray-50 active:scale-90 transition-all">
@@ -80,19 +70,13 @@ const SidebarComponent = {
 
         sidebarContainer.innerHTML = html;
         this.attachEventListeners();
-        this.updateDarkModeState();
     },
 
     attachEventListeners() {
-        const toggle = document.getElementById('dark-mode-toggle');
         const logout = document.getElementById('logout-btn');
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
-
-        if (toggle) {
-            toggle.onclick = () => this.toggleDarkMode();
-        }
 
         if (logout) {
             logout.onclick = () => {
@@ -115,36 +99,6 @@ const SidebarComponent = {
                 overlay.classList.add('opacity-0');
                 setTimeout(() => overlay.classList.add('hidden'), 300);
             };
-        }
-    },
-
-    toggleDarkMode() {
-        const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('darkMode', isDark);
-        this.updateDarkModeState();
-        
-        // Haptic Feedback
-        if ('vibrate' in navigator) window.navigator.vibrate(20);
-        
-        NotificationSystem.show(isDark ? "Dark Mode Enabled" : "Light Mode Enabled", "info");
-    },
-
-    updateDarkModeState() {
-        const isDark = document.documentElement.classList.contains('dark');
-        const toggle = document.getElementById('dark-mode-toggle');
-        const dot = document.getElementById('dark-mode-dot');
-        const iconContainer = document.getElementById('dark-mode-icon');
-
-        if (toggle && dot) {
-            toggle.classList.toggle('bg-blue-600', isDark);
-            toggle.classList.toggle('bg-white/20', !isDark);
-            toggle.setAttribute('aria-checked', isDark);
-            dot.classList.toggle('translate-x-6', isDark);
-            dot.classList.toggle('translate-x-1', !isDark);
-        }
-
-        if (iconContainer) {
-            iconContainer.innerHTML = isDark ? this.icons.sun : this.icons.moon;
         }
     },
 

@@ -8,11 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script>
         // Inline script to prevent FOUC (Flash of Unstyled Content)
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        document.documentElement.classList.remove('dark');
     </script>
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -53,7 +49,7 @@
         }
     </style>
 </head>
-<body class="bg-white dark:bg-slate-900 flex min-h-screen overflow-hidden">
+<body class="bg-white flex min-h-screen overflow-hidden">
 
     <!-- Left Panel: 70% Immersive Visualization -->
     <div class="hidden lg:flex lg:w-[70%] hero-gradient relative overflow-hidden curved-edge shadow-2xl z-10">
@@ -71,7 +67,7 @@
         <div class="relative z-20 w-full flex flex-col justify-between p-20">
             <!-- Large Text Header -->
             <div class="space-y-6">
-                <h1 class="text-white text-7xl font-black leading-none tracking-tighter">
+                <h1 class="text-white text-7xl font-bold leading-none tracking-tighter">
                     Future-Ready <br/>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-white">Event Intelligence.</span>
                 </h1>
@@ -88,9 +84,9 @@
                             <div class="w-2.5 h-2.5 bg-orange-500 rounded-full pulsing"></div>
                             <div class="absolute w-5 h-5 bg-orange-500/30 rounded-full animate-ping"></div>
                         </div>
-                        <span class="text-white text-[10px] font-black uppercase tracking-[0.3em]">Live Event</span>
+                        <span class="text-white text-[10px] font-bold tracking-[0.1em]">Live Event</span>
                     </div>
-                    <div class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">Attendance Check-in Active</div>
+                    <div class="text-[10px] font-bold text-orange-400">Attendance Check-in Active</div>
                 </div>
 
                 <div class="flex items-center space-x-6 mb-8">
@@ -98,8 +94,8 @@
                         <img src="https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=100" alt="Tech Summit" class="w-full h-full object-cover opacity-60">
                     </div>
                     <div>
-                        <h3 class="text-white text-2xl font-black tracking-tight">Tech Summit 2026</h3>
-                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Global Main Stage</p>
+                        <h3 class="text-white text-2xl font-bold tracking-tight">Tech Summit 2026</h3>
+                        <p class="text-slate-400 text-xs font-bold">Global Main Stage</p>
                     </div>
                 </div>
 
@@ -130,8 +126,8 @@
                     </svg>
                 </div>
                 <div class="space-y-2 text-center lg:text-left">
-                    <h2 class="text-4xl font-black text-slate-900 tracking-tighter">Welcome Back</h2>
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Login to manage your event intelligence</p>
+                    <h2 class="text-4xl font-bold text-slate-900 tracking-tighter">Welcome Back</h2>
+                    <p class="text-slate-400 font-bold text-xs">Login to manage your event intelligence</p>
                 </div>
             </div>
 
@@ -139,7 +135,7 @@
             <form id="accessForm" class="w-full space-y-8">
                 <!-- Access Script Field -->
                 <div class="space-y-3">
-                    <label for="accessScript" class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Access Script</label>
+                    <label for="accessScript" class="text-[10px] font-bold text-slate-400 ml-1">Access Script</label>
                     <div class="relative group">
                         <input type="password" id="accessScript" required placeholder="Enter access script..." 
                                class="w-full px-6 py-4.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-500/5 focus:border-red-600 transition-all duration-300 font-bold text-slate-800 pr-14">
@@ -152,13 +148,13 @@
                         </button>
                     </div>
                     <div class="flex justify-end">
-                        <a href="#" class="text-[10px] font-black text-red-600 uppercase tracking-widest hover:text-red-700 transition-colors">Forgot Password?</a>
+                        <a href="#" class="text-[10px] font-bold text-red-600 hover:text-red-700 transition-colors">Forgot Password?</a>
                     </div>
-                    <p id="errorMessage" class="hidden text-[10px] font-black text-red-600 uppercase tracking-widest ml-1 mt-2">Access script verification failed</p>
+                    <p id="errorMessage" class="hidden text-[10px] font-bold text-red-600 ml-1 mt-2">Access script verification failed</p>
                 </div>
 
                 <!-- Login Button -->
-                <button type="submit" id="submitBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl shadow-2xl shadow-red-500/20 active:scale-95 transition-all duration-300 flex items-center justify-center space-x-3">
+                <button type="submit" id="submitBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-5 rounded-2xl shadow-2xl shadow-red-500/20 active:scale-95 transition-all duration-300 flex items-center justify-center space-x-3">
                     <span id="btnText">Verify Access</span>
                     <div id="btnLoader" class="hidden">
                         <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -168,8 +164,8 @@
 
             <!-- Sign Up Link -->
             <div class="w-full text-center">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    Don't have an account? <a href="#" class="text-red-600 font-black hover:text-red-700 transition-colors">Sign Up</a>
+                <p class="text-[10px] font-bold text-slate-400">
+                    Don't have an account? <a href="#" class="text-red-600 font-bold hover:text-red-700 transition-colors">Sign Up</a>
                 </p>
             </div>
         </div>
@@ -178,7 +174,7 @@
         <div class="w-full flex flex-col items-center space-y-6 pt-12 mt-auto">
             <div class="flex items-center space-x-4 w-full">
                 <div class="h-[1px] flex-grow bg-slate-100"></div>
-                <span class="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Quick Access</span>
+                <span class="text-[10px] font-bold text-slate-300 tracking-[0.1em]">Quick Access</span>
                 <div class="h-[1px] flex-grow bg-slate-100"></div>
             </div>
             <div class="flex items-center space-x-4">
