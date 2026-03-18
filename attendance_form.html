@@ -3,421 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Attendance | Training Series</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Online Attendance Form | Event Tracker System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script>
-        // Inline script to prevent FOUC (Flash of Unstyled Content)
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background-color: #f0f0f0; }
+        .form-container { 
+            background: #ffffff; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); 
+            border-radius: 12px;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 40px;
+            border: 1px solid #ddd;
+        }
+        .header-text { font-size: 24px; font-weight: 800; color: #000; margin-bottom: 20px; }
+        .section-header { font-size: 14px; font-weight: 800; color: #000; text-transform: uppercase; margin-top: 30px; margin-bottom: 15px; }
+        .privacy-box { font-size: 11px; color: #333; line-height: 1.6; margin-bottom: 20px; }
+        .label-text { font-size: 11px; font-weight: 700; color: #000; text-transform: uppercase; margin-bottom: 6px; display: block; }
+        .input-field { 
+            width: 100%; 
+            padding: 10px 14px; 
+            border: 1.5px solid #C084FC; /* Purple border from image */
+            border-radius: 6px; 
+            font-size: 13px; 
+            outline: none;
+            transition: border-color 0.2s;
+            background: #fff;
+            color: #333;
+        }
+        .input-field:focus { border-color: #A855F7; box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1); }
+        .signature-pad { border: 1.5px solid #C084FC; border-radius: 8px; background: #fff; cursor: crosshair; }
+        .btn-register { background: #0038A8; color: white; padding: 10px 24px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+        .btn-clear { background: #FF0000; color: white; padding: 10px 24px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+        .btn-signature-clear { background: #6366F1; color: white; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 10px; margin-top: 10px; }
+        
+        /* Grid Layout matching the image */
+        .personal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .address-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        
+        @media (max-width: 768px) {
+            .personal-grid, .address-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .personal-grid, .address-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans">
-    <!-- Sidebar Container -->
-    <div id="sidebar-container"></div>
+<body class="p-4 sm:p-8">
 
-    <!-- Main Content -->
-    <main class="lg:ml-72 py-8 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-5xl mx-auto card-theme rounded-2xl shadow-xl overflow-hidden border border-gray-100 transition-all duration-300">
-            <!-- Header -->
-            <div class="p-8 border-b border-gray-100 dark:border-slate-700">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Online Attendance | Training Series</h1>
+    <div id="mainContainer" class="max-w-4xl mx-auto">
+        <h1 class="header-text">Online Attendance for Training Series: <span id="eventTitle">Loading...</span></h1>
+        
+        <div class="form-container">
+            <div id="loadingView" class="text-center py-20 font-bold text-slate-500">
+                Fetching event information...
             </div>
 
-            <form id="attendanceForm" class="p-8 space-y-12">
+            <form id="checkinForm" class="hidden space-y-8">
                 <!-- Privacy Statement -->
-                <section class="space-y-6">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-[#155DFC]/10 rounded-lg flex items-center justify-center">
-                            <svg class="w-4 h-4 text-[#155DFC]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M12 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white uppercase tracking-wider">Privacy Statement</h2>
+                <div class="space-y-4">
+                    <h2 class="section-header">Privacy Statement</h2>
+                    <div class="privacy-box">
+                        In compliance with the Data Privacy Act of 2012 (Republic Act No. 10173), the Department of Information and Communications Technology (DICT) ensures that all personal information collected through this attendance form shall be protected and processed with utmost confidentiality. The data collected (e.g., name, contact details, and other related information) will be used solely for attendance monitoring, documentation, and other related official purposes of DICT. Access to this information shall be limited to authorized personnel only and will not be disclosed to any third party without your consent, unless otherwise required by law or relevant government regulations. All personal data shall be stored securely and retained only for as long as necessary to fulfill its intended purpose, after which it will be disposed of in accordance with applicable data privacy and records management policies.<br><br>
+                        <strong>In Compliance:</strong> By filling out this form, you hereby acknowledge that you have read and understood this statement and give your consent to the collection and processing of your personal data for the purposes stated above.
                     </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-700">
-                        <p>In compliance with the Data Privacy Act of 2012 (Republic Act No. 10173), the Department of Information and Communications Technology (DICT) ensures that all personal information collected through this attendance form shall be protected and processed with utmost confidentiality. The data collected (e.g., name, contact details, and other relevant information) will be used solely for attendance monitoring, documentation, and other related official purposes of DICT. Access to this information shall be limited to authorized personnel only and will not be disclosed to any third party without your consent, unless otherwise required by law or relevant government regulations. All personal data shall be stored securely and retained only for as long as necessary to fulfill its intended purpose, after which it will be disposed of in accordance with applicable data privacy and records management policies.</p>
-                        <p class="mt-4 font-bold text-gray-800 dark:text-gray-200">In Compliance: <span class="font-normal text-gray-500 italic">By filling out this form, you hereby acknowledge that you have read and understood this statement and give your consent to the collection and processing of your personal data for the purposes stated above.</span></p>
-                    </div>
-                </section>
+                </div>
 
-                <!-- Dynamic Personal Information Section -->
-                <section class="space-y-8">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-[#155DFC]/10 rounded-lg flex items-center justify-center">
-                            <svg class="w-4 h-4 text-[#155DFC]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white uppercase tracking-wider">Personal Information</h2>
+                <!-- Personal Information -->
+                <div class="space-y-4">
+                    <h2 class="section-header">Personal Information</h2>
+                    <div id="personalInfoGrid" class="personal-grid">
+                        <!-- Fields will be injected here if dynamic, or we can pre-layout common ones -->
                     </div>
-                    <div id="dynamicFields" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <!-- Fields will be injected here -->
-                        <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                        <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                        <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                        <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                        <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                        <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                    </div>
-                </section>
+                </div>
 
-                <!-- Signature Section -->
-                <section class="space-y-6">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-[#155DFC]/10 rounded-lg flex items-center justify-center">
-                            <svg class="w-4 h-4 text-[#155DFC]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white uppercase tracking-wider">Signature</h2>
+                <!-- Address -->
+                <div class="space-y-4">
+                    <h2 class="section-header">Address</h2>
+                    <div id="addressGrid" class="address-grid">
+                        <!-- Address fields will be injected here -->
                     </div>
-                    <p class="text-sm font-bold text-gray-700 dark:text-gray-300 ml-1">Please sign below:</p>
-                    <div class="relative group">
-                        <canvas id="signaturePad" class="w-full h-64 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 dark:bg-slate-800 dark:border-slate-700 cursor-crosshair transition-all group-hover:border-[#155DFC] group-hover:shadow-lg group-hover:shadow-blue-500/5"></canvas>
-                        <button type="button" id="clearSignature" class="mt-4 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300 text-xs font-bold py-3 px-6 rounded-xl transition-all duration-200 flex items-center shadow-sm active:scale-95">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            Clear Signature
-                        </button>
-                    </div>
-                </section>
+                </div>
 
-                <!-- Submit Button -->
-                <div class="pt-10 border-t border-gray-100 dark:border-slate-700 flex justify-end">
-                    <button type="submit" id="submitBtn" class="bg-[#155DFC] hover:bg-[#1048c7] text-white font-bold py-4 px-12 rounded-2xl shadow-xl shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 flex items-center space-x-3">
-                        <span id="btnText" class="text-lg">Submit Attendance</span>
+                <!-- Signature -->
+                <div class="space-y-4">
+                    <h2 class="section-header">Signature</h2>
+                    <p class="label-text">Please sign below:</p>
+                    <div class="relative">
+                        <canvas id="signaturePad" class="signature-pad w-full h-64"></canvas>
+                        <button type="button" onclick="clearSignature()" class="btn-signature-clear">Clear Signature</button>
+                    </div>
+                </div>
+
+                <!-- Footer Buttons -->
+                <div class="flex justify-end items-center space-x-4 pt-10 border-t border-slate-100">
+                    <button type="reset" class="btn-clear" onclick="window.location.reload()">Clear Form</button>
+                    <button type="submit" id="submitBtn" class="btn-register flex items-center space-x-2">
+                        <span>Register</span>
                         <div id="btnLoader" class="hidden">
-                            <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         </div>
                     </button>
                 </div>
             </form>
+
+            <!-- Success Message -->
+            <div id="successView" class="hidden text-center py-20 space-y-6">
+                <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto text-white">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 class="text-3xl font-black text-slate-900">Check-in Successful!</h2>
+                <p class="text-slate-500 font-bold">Thank you for attending. Your attendance has been recorded.</p>
+                <button onclick="window.location.reload()" class="text-blue-600 font-bold hover:underline">Submit another response</button>
+            </div>
         </div>
-    </main>
+    </div>
 
     <script src="script.js"></script>
-    <script src="components.js"></script>
     <script>
-        // Signature Logic
-        const canvas = document.getElementById('signaturePad');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
+        let signaturePad, canvas, ctx, isDrawing = false;
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id');
+        const SHEET_NAME = "Attendance Form";
+        let eventName = "";
 
-        function resizeCanvas() {
+        function getRowVal(row, targetHeader) {
+            if (!row) return null;
+            const keys = Object.keys(row);
+            let key = keys.find(k => k.toLowerCase() === targetHeader.toLowerCase());
+            if (key) return row[key];
+            key = keys.find(k => k.toLowerCase().includes(targetHeader.toLowerCase()));
+            return key ? row[key] : null;
+        }
+
+        async function initCheckin() {
+            if (!eventId) {
+                document.getElementById('eventTitle').innerText = "Invalid Access";
+                document.getElementById('loadingView').innerText = "Please use a valid check-in link.";
+                return;
+            }
+
+            try {
+                const response = await getFullSheetData("Events");
+                if (!response || !response.data) throw new Error("Could not load event data.");
+
+                const normalize = (val) => {
+                    if (val === null || val === undefined) return "";
+                    let str = String(val).trim();
+                    if (str.startsWith("'")) str = str.substring(1);
+                    return str.toLowerCase();
+                };
+
+                const getTime = (val) => {
+                    if (!val) return null;
+                    const d = new Date(val);
+                    return isNaN(d.getTime()) ? null : d.getTime();
+                };
+
+                const searchId = normalize(eventId);
+                const searchTime = getTime(eventId);
+
+                const targetEvent = response.data.find(e => {
+                    const idCols = ["Event ID", "ID"];
+                    for (const col of idCols) {
+                        const val = getRowVal(e, col);
+                        if (val && normalize(val) === searchId) return true;
+                    }
+                    if (searchTime) {
+                        for (const col in e) {
+                            if (col.toLowerCase().includes('date') || col.toLowerCase().includes('timestamp')) {
+                                const rowTime = getTime(e[col]);
+                                if (rowTime === searchTime) return true;
+                            }
+                        }
+                    }
+                    return Object.values(e).some(val => val && normalize(val) === searchId);
+                });
+                
+                if (!targetEvent) throw new Error("Event not found.");
+                
+                eventName = getRowVal(targetEvent, "Description/Title") || getRowVal(targetEvent, "Event Name") || getRowVal(targetEvent, "Description") || "Untitled Event";
+                document.getElementById('eventTitle').innerText = eventName;
+                document.getElementById('loadingView').classList.add('hidden');
+                document.getElementById('checkinForm').classList.remove('hidden');
+
+                const attendanceResponse = await getFullSheetData(SHEET_NAME);
+                const schema = attendanceResponse.headers;
+                
+                const personalGrid = document.getElementById('personalInfoGrid');
+                const addressGrid = document.getElementById('addressGrid');
+
+                schema.forEach(col => {
+                    const low = col.toLowerCase();
+                    if (low.includes('timestamp') || low.includes('signature') || low.includes('event')) return;
+
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.className = 'flex flex-col';
+                    
+                    // List of required labels
+                    const requiredLabels = ['email', 'firstname', 'lastname', 'mobile no', 'sex', 'gender', 'age', 'sector', 'senior citizen', 'disabled', 'position', 'region', 'province'];
+                    const isRequired = requiredLabels.some(label => low.includes(label.toLowerCase()));
+                    
+                    let inputHtml = `<input type="text" name="${col}" ${isRequired ? 'required' : ''} class="input-field">`;
+                    
+                    if (low === 'sex' || low === 'gender' || low.includes('senior citizen') || low.includes('disabled') || low.includes('sector') || low.includes('industry') || low === 'region') {
+                        inputHtml = `<select name="${col}" ${isRequired ? 'required' : ''} class="input-field appearance-none"><option value="">Select...</option></select>`;
+                    }
+
+                    fieldDiv.innerHTML = `<label class="label-text">${col}${isRequired ? '<span style="color: red;">*</span>' : ''}:</label>${inputHtml}`;
+                    
+                    // Categorize based on common headers
+                    if (low.includes('region') || low.includes('province') || low.includes('city') || low.includes('municipality') || low.includes('address')) {
+                        addressGrid.appendChild(fieldDiv);
+                    } else {
+                        personalGrid.appendChild(fieldDiv);
+                    }
+
+                    // Populate Selects if they are specific ones
+                    if (inputHtml.includes('select')) {
+                        const select = fieldDiv.querySelector('select');
+                        if (low === 'sex') {
+                            ['Male', 'Female'].forEach(opt => select.add(new Option(opt, opt)));
+                        } else if (low === 'gender') {
+                            ['Cisgender (Masculine/Feminine)', 'Transgender', 'Non-binary', 'Genderqueer', 'Prefer not to say', 'Others'].forEach(opt => select.add(new Option(opt, opt)));
+                        } else if (low.includes('senior citizen') || low.includes('disabled')) {
+                            ['YES', 'NO'].forEach(opt => select.add(new Option(opt, opt)));
+                        } else if (low === 'region') {
+                            [
+                                'CAR - Cordillera Administrative Region',
+                                '1 - Ilocos Region',
+                                '2 - Cagayan Valley',
+                                '3 - Central Luzon',
+                                '4A - CALABARZON',
+                                '4B - MIMAROPA',
+                                '5 - Bicol Region',
+                                'NCR - National Capital Region',
+                                '6 - Western Visayas',
+                                '7 - Central Visayas',
+                                '8 - Eastern Visayas',
+                                '9 - Zamboanga Peninsula',
+                                '10 - Northern Mindanao',
+                                '11 - Davao Region',
+                                '12 - SOCCKSARGEN',
+                                '13 - Caraga Region',
+                                'BARMM - Bangsamoro Autonomous Region in Muslim Mindanao'
+                            ].forEach(opt => {
+                                // For NCR, the photo shows it without quotes
+                                const label = opt === 'NCR - National Capital Region' ? opt : opt;
+                                select.add(new Option(label, label));
+                            });
+                        } else if (low === 'industry') {
+                            ['LGU', 'National Government Agency', 'State University College', 'Private', 'Self Employed', 'None'].forEach(opt => select.add(new Option(opt, opt)));
+                        } else if (low === 'sector') {
+                            [
+                                'Out of School Youth',
+                                'ALS Student',
+                                'Student',
+                                'Teacher',
+                                'Indigenous People',
+                                'Government',
+                                'OFW',
+                                'Non-Teaching Staff (Librarian, School Admin Staff, Etc.)',
+                                'Others ( Farmers/ Agriculture Sector, Etc.)'
+                            ].forEach(opt => select.add(new Option(opt, opt)));
+                        }
+                    }
+                });
+
+                initSignature();
+            } catch (err) {
+                document.getElementById('eventTitle').innerText = "Access Error";
+                document.getElementById('loadingView').innerText = err.message;
+            }
+        }
+
+        function initSignature() {
+            canvas = document.getElementById('signaturePad');
+            ctx = canvas.getContext('2d');
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             ctx.scale(ratio, ratio);
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        canvas.addEventListener('mousedown', (e) => { drawing = true; draw(e); });
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
-        
-        canvas.addEventListener('touchstart', (e) => { drawing = true; draw(e.touches[0]); e.preventDefault(); });
-        canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); });
-        canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
-
-        function draw(e) {
-            if (!drawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
             ctx.strokeStyle = '#000';
 
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            };
+
+            const start = (e) => { isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); };
+            const move = (e) => { if (!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); };
+            const end = () => { isDrawing = false; };
+
+            canvas.addEventListener('mousedown', start);
+            canvas.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', end);
+            canvas.addEventListener('touchstart', start);
+            canvas.addEventListener('touchmove', move);
+            canvas.addEventListener('touchend', end);
         }
 
-        document.getElementById('clearSignature').addEventListener('click', () => {
+        function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
-
-        // Dynamic Fields Logic
-        async function initForm() {
-            const container = document.getElementById('dynamicFields');
-            
-            // Display Skeleton Loaders (Pure Tailwind animate-pulse)
-            container.innerHTML = `
-                <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-                <div class="space-y-3"><div class="h-4 w-20 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div><div class="h-14 w-full bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse"></div></div>
-            `;
-
-            const metadata = await getSheetMetadata();
-            if (!metadata) {
-                NotificationSystem.show("Failed to load form fields.", "error");
-                return;
-            }
-
-            // Target specifically the "Attendance Form" sheet
-            const targetSheet = "Attendance Form";
-            const columns = metadata[targetSheet];
-
-            if (!columns) {
-                NotificationSystem.show(`Sheet "${targetSheet}" not found!`, "error");
-                container.innerHTML = `<p class="text-red-500 italic col-span-full text-center py-8">Error: Sheet "${targetSheet}" was not found in the spreadsheet.</p>`;
-                return;
-            }
-
-            container.innerHTML = '';
-
-            // Required columns provided by user
-            const requiredList = ['email', 'firstname', 'lastname', 'mobile no', 'sex', 'gender', 'age', 'sector', 'seniorcitizen', 'region', 'province', 'agency', 'position', 'signature', 'disabled', 'industry'];
-
-            // Fetch dynamic events for dropdowns
-            let dynamicEvents = [];
-            try {
-                const eventMetadata = await getSheetMetadata();
-                if (eventMetadata && eventMetadata["Events"]) {
-                    const eventData = await getFullSheetData("Events");
-                    if (eventData && eventData.data) {
-                        const firstCol = eventData.headers[0];
-                        dynamicEvents = eventData.data.map(r => r["Event Name"] || r[firstCol]).filter(Boolean);
-                    }
-                }
-            } catch (e) { console.error("Error fetching events for form:", e); }
-
-            // Store signature column name to use during submission
-            const signatureCol = columns.find(c => c.toLowerCase().trim() === 'signature');
-            if (signatureCol) {
-                document.getElementById('attendanceForm').dataset.signatureCol = signatureCol;
-            }
-
-            columns.forEach(col => {
-                const lowerCol = col.toLowerCase().trim();
-                
-                // If it's the signature column, we handle it via the canvas pad, so skip input generation
-                if (lowerCol === 'signature') return;
-
-                const fieldDiv = document.createElement('div');
-                fieldDiv.className = 'space-y-1 fade-in';
-                
-                const label = col.toUpperCase().replace(/_/g, ' ');
-                
-                // Map input types based on column names
-                let inputType = 'text';
-                if (lowerCol.includes('email')) inputType = 'email';
-                else if (lowerCol.includes('mobile') || lowerCol.includes('no')) inputType = 'tel';
-                else if (lowerCol.includes('age')) inputType = 'number';
-
-                // Check if this column is in the user's required list
-                const isRequired = requiredList.includes(lowerCol) ? 'required' : '';
-
-                // CSS Classes for input visibility and styling
-                const inputClasses = "w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-[#155DFC]/10 focus:border-[#155DFC] transition-all duration-300 text-slate-900 dark:text-white font-semibold shadow-sm hover:border-slate-300 dark:hover:border-slate-600";
-
-                if (lowerCol === 'event' || lowerCol === 'event name') {
-                    fieldDiv.innerHTML = `
-                        <label class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight ml-1">
-                            ${label}:${isRequired ? ' <span class="text-red-500">*</span>' : ''}
-                        </label>
-                        <select name="${col}" class="${inputClasses}" ${isRequired}>
-                            <option value="" disabled selected>Select Event</option>
-                            ${dynamicEvents.length > 0 
-                                ? dynamicEvents.map(opt => `<option value="${opt}">${opt}</option>`).join('')
-                                : '<option value="Tech Summit 2026">Tech Summit 2026</option>'
-                            }
-                        </select>
-                    `;
-                } else if (lowerCol === 'gender') {
-                    const genderOptions = [
-                        "Cisgender (Masculine/Feminine)",
-                        "Transgender",
-                        "Non-binary",
-                        "Genderqueer",
-                        "Prefer not to say"
-                    ];
-                    
-                    fieldDiv.innerHTML = `
-                        <label class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight ml-1">
-                            ${label}:${isRequired ? ' <span class="text-red-500">*</span>' : ''}
-                        </label>
-                        <select name="${col}" class="${inputClasses}" ${isRequired}>
-                            <option value="" disabled selected>Select Gender</option>
-                            ${genderOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                        </select>
-                    `;
-                } else if (lowerCol === 'sex') {
-                    const sexOptions = ["Male", "Female"];
-                    fieldDiv.innerHTML = `
-                        <label class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight ml-1">
-                            ${label}:${isRequired ? ' <span class="text-red-500">*</span>' : ''}
-                        </label>
-                        <select name="${col}" class="${inputClasses}" ${isRequired}>
-                            <option value="" disabled selected>Select Sex</option>
-                            ${sexOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                        </select>
-                    `;
-                } else if (lowerCol === 'seniorcitizen' || lowerCol === 'disabled') {
-                    const scOptions = ["Yes", "No"];
-                    fieldDiv.innerHTML = `
-                        <label class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight ml-1">
-                            ${label}:${isRequired ? ' <span class="text-red-500">*</span>' : ''}
-                        </label>
-                        <select name="${col}" class="${inputClasses}" ${isRequired}>
-                            <option value="" disabled selected>Select Option</option>
-                            ${scOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                        </select>
-                    `;
-                } else if (lowerCol === 'industry') {
-                    const industryOptions = ["LGU", "National Government Agency", "State University College", "Private", "Self Employed", "None"];
-                    fieldDiv.innerHTML = `
-                        <label class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight ml-1">
-                            ${label}:${isRequired ? ' <span class="text-red-500">*</span>' : ''}
-                        </label>
-                        <select name="${col}" class="${inputClasses}" ${isRequired}>
-                            <option value="" disabled selected>Select Industry</option>
-                            ${industryOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                        </select>
-                    `;
-                } else if (lowerCol === 'sector') {
-                    const sectorOptions = [
-                        "Out of School Youth",
-                        "ALS Student",
-                        "Student",
-                        "Teacher",
-                        "Indigenous People",
-                        "Government",
-                        "OFW",
-                        "Non-Teaching Staff (Librarian, School Admin Staff, Etc.)",
-                        "Others ( Farmers/ Agriculture Sector, Etc.)"
-                    ];
-                    fieldDiv.innerHTML = `
-                        <label class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight ml-1">
-                            ${label}:${isRequired ? ' <span class="text-red-500">*</span>' : ''}
-                        </label>
-                        <select name="${col}" class="${inputClasses}" ${isRequired}>
-                            <option value="" disabled selected>Select Sector</option>
-                            ${sectorOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                        </select>
-                    `;
-                } else if (lowerCol === 'region') {
-                    const regionOptions = [
-                        "CAR - Cordillera Administrative Region",
-                        "1 - Ilocos Region",
-                        "2 - Cagayan Valley",
-                        "3 - Central Luzon",
-                        "4A - CALABARZON",
-                        "4B - MIMAROPA",
-                        "5 - Bicol Region",
-                        "NCR - National Capital Region",
-                        "6 - Western Visayas",
-                        "7 - Central Visayas",
-                        "8 - Eastern Visayas",
-                        "9 - Zamboanga Peninsula",
-                        "10 - Northern Mindanao",
-                        "11 - Davao Region",
-                        "12 - SOCCSKSARGEN",
-                        "13 - Caraga Region",
-                        "BARMM - Bangsamoro Autonomous Region in Muslim Mindanao"
-                    ];
-                    fieldDiv.innerHTML = `
-                        <label class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight ml-1">
-                            ${label}:${isRequired ? ' <span class="text-red-500">*</span>' : ''}
-                        </label>
-                        <select name="${col}" class="${inputClasses}" ${isRequired}>
-                            <option value="" disabled selected>Select Region</option>
-                            ${regionOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                        </select>
-                    `;
-                } else {
-                    fieldDiv.innerHTML = `
-                        <label class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight ml-1">
-                            ${label}:${isRequired ? ' <span class="text-red-500">*</span>' : ''}
-                        </label>
-                        <input type="${inputType}" name="${col}" class="${inputClasses}" ${isRequired}>
-                    `;
-                }
-                container.appendChild(fieldDiv);
-            });
-
-            // Store current sheet name
-            document.getElementById('attendanceForm').dataset.sheet = targetSheet;
         }
 
-        // Check if signature is empty
-        function isCanvasEmpty(canvas) {
+        // Check if canvas is empty
+        function isCanvasBlank(canvas) {
             const blank = document.createElement('canvas');
             blank.width = canvas.width;
             blank.height = canvas.height;
             return canvas.toDataURL() === blank.toDataURL();
         }
 
-        // Form Submission
-        async function saveAttendanceData(formElement) {
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const btnLoader = document.getElementById('btnLoader');
-
-            // Validate Signature
-            if (isCanvasEmpty(canvas)) {
-                NotificationSystem.show("Please provide your signature before submitting.", "warning");
+        document.getElementById('checkinForm').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            if (isCanvasBlank(document.getElementById('signaturePad'))) {
+                alert("Please provide your signature.");
                 return;
             }
 
-            // Start Loading State
-            submitBtn.disabled = true;
-            btnText.innerText = "Submitting...";
-            btnLoader.classList.remove('hidden');
+            const btn = document.getElementById('submitBtn');
+            const loader = document.getElementById('btnLoader');
+            btn.disabled = true;
+            loader.classList.remove('hidden');
 
-            const formData = new FormData(formElement);
-            const data = {
-                sheetName: formElement.dataset.sheet,
-                auth_token: SECRET_KEY
+            const payload = { 
+                action: "create", 
+                sheetName: SHEET_NAME,
+                Timestamp: new Date().toISOString(),
+                Event: eventName,
+                Signature: canvas.toDataURL('image/png')
             };
-            
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
 
-            // Add signature as base64 string using the stored original column name
-            const sigColName = formElement.dataset.signatureCol || 'signature';
-            data[sigColName] = canvas.toDataURL();
+            new FormData(e.target).forEach((val, key) => payload[key] = val);
 
             try {
-                // Since GAS uses no-cors for POST, we can't see the response content, 
-                // but we can catch network errors.
-                await fetch(GAS_WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data)
-                });
-
-                NotificationSystem.show("Attendance submitted successfully!", "success");
-                formElement.reset();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            } catch (error) {
-                console.error(error);
-                NotificationSystem.show("Submission failed. Please try again.", "error");
-            } finally {
-                submitBtn.disabled = false;
-                btnText.innerText = "Submit Attendance";
-                btnLoader.classList.add('hidden');
+                const res = await postToGAS(payload);
+                if (res.status === "success") {
+                    document.getElementById('checkinForm').classList.add('hidden');
+                    document.getElementById('successView').classList.remove('hidden');
+                } else {
+                    alert("Error: " + res.message);
+                    btn.disabled = false;
+                    loader.classList.add('hidden');
+                }
+            } catch (err) {
+                alert("Submission failed.");
+                btn.disabled = false;
+                loader.classList.add('hidden');
             }
-        }
+        };
 
-        // Event Listener for the form
-        document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await saveAttendanceData(e.target);
-        });
-
-        window.addEventListener('DOMContentLoaded', initForm);
+        window.addEventListener('DOMContentLoaded', initCheckin);
     </script>
 </body>
 </html>
