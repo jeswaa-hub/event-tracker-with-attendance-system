@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Monitoring | Event Tracker System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script>
+        // Inline script to prevent FOUC (Flash of Unstyled Content)
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 8-pt Grid System */
+            --grid-unit: 8px;
+            --space-1: calc(var(--grid-unit) * 1);
+            --space-2: calc(var(--grid-unit) * 2);
+            --space-3: calc(var(--grid-unit) * 3);
+            --space-4: calc(var(--grid-unit) * 4);
+            --space-6: calc(var(--grid-unit) * 6);
+            --space-8: calc(var(--grid-unit) * 8);
+            --space-12: calc(var(--grid-unit) * 12);
+
+            /* WCAG 2.2 AA Color Palette (Light) */
+            --bg-page: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --bg-sidebar: #155DFC;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --accent-primary: #155DFC;
+            --accent-hover: #1048C7;
+            --border-subtle: #E2E8F0;
+            --status-present-bg: #F0FDF4;
+            --status-present-text: #166534;
+            --status-late-bg: #FFFBEB;
+            --status-late-text: #92400E;
+            --status-absent-bg: #FEF2F2;
+            --status-absent-text: #991B1B;
+            
+            /* Transitions */
+            --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dark {
+            /* WCAG 2.2 AA Color Palette (Dark - Midnight Blue) */
+            --bg-page: #020617;
+            --bg-card: #0B1120;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border-subtle: #1E293B;
+            --status-present-bg: rgba(34, 197, 94, 0.1);
+            --status-present-text: #4ADE80;
+            --status-late-bg: rgba(245, 158, 11, 0.1);
+            --status-late-text: #FBBF24;
+            --status-absent-bg: rgba(239, 68, 68, 0.1);
+            --status-absent-text: #F87171;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Component Styles */
+        .glass-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: all var(--transition-fast);
+        }
+        .glass-card:hover {
+            border-color: rgba(21, 93, 252, 0.3);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        .data-grid-header {
+            @apply sticky top-0 z-20 backdrop-blur-md;
+            background-color: rgba(var(--bg-card), 0.8);
+        }
+
+        .status-badge {
+            @apply px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest inline-flex items-center space-x-1.5;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: var(--border-subtle); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--text-muted); }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--border-subtle) 25%, var(--bg-page) 50%, var(--border-subtle) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen selection:bg-blue-500/20 selection:text-blue-600">
+    <!-- Sidebar Container -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-72 min-h-screen py-12 px-6 sm:px-10 lg:px-14">
+        <div class="max-w-full mx-auto space-y-10">
+            
+            <!-- Global Stats Bar (Dynamic Island style) -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="glass-card p-6 rounded-3xl flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Records</p>
+                        <h4 id="statTotal" class="text-2xl font-black text-slate-900 dark:text-white">0</h4>
+                    </div>
+                </div>
+                <div class="glass-card p-6 rounded-3xl flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Today's Presence</p>
+                        <h4 id="statToday" class="text-2xl font-black text-slate-900 dark:text-white">0</h4>
+                    </div>
+                </div>
+                <div class="glass-card p-6 rounded-3xl flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Late Arrivals</p>
+                        <h4 id="statLate" class="text-2xl font-black text-slate-900 dark:text-white">0</h4>
+                    </div>
+                </div>
+                <div class="glass-card p-6 rounded-3xl flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-rose-500/10 rounded-2xl flex items-center justify-center text-rose-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Absences</p>
+                        <h4 id="statAbsent" class="text-2xl font-black text-slate-900 dark:text-white">0</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Filter Bar -->
+            <div class="glass-card p-4 rounded-[2rem] flex flex-wrap items-center gap-4 animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="relative flex-grow min-w-[300px]">
+                    <input type="text" id="searchInput" placeholder="Search by name, email, or department..." class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-sm">
+                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 flex-wrap">
+                    <!-- Event Filter -->
+                    <div class="relative group">
+                        <select id="eventFilter" class="appearance-none bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-6 py-4 pr-12 text-xs font-black text-slate-700 dark:text-white uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer">
+                            <option value="all">All Events</option>
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Date Range Filter (Native Placeholder) -->
+                    <div class="flex items-center space-x-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2">
+                        <input type="date" id="dateFrom" class="bg-transparent border-none text-xs font-bold focus:ring-0">
+                        <span class="text-slate-400 text-xs">to</span>
+                        <input type="date" id="dateTo" class="bg-transparent border-none text-xs font-bold focus:ring-0">
+                    </div>
+
+                    <button id="refreshBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest py-4 px-8 rounded-2xl transition-all shadow-xl shadow-blue-500/20 active:scale-95 flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span>Sync</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bulk Actions Toolbar (Hidden by default) -->
+            <div id="bulkToolbar" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-4 rounded-3xl shadow-2xl flex items-center space-x-6 transform translate-y-20 opacity-0 transition-all duration-500 pointer-events-none">
+                <div class="flex items-center space-x-3 border-r border-white/20 dark:border-slate-200 pr-6">
+                    <span id="selectedCount" class="text-xs font-black">0</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Selected</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-[10px] font-black uppercase tracking-widest hover:text-blue-400 transition-colors flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <button class="text-[10px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 transition-colors flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <span>Bulk Delete</span>
+                    </button>
+                </div>
+                <button onclick="deselectAll()" class="p-2 hover:bg-white/10 dark:hover:bg-slate-100 rounded-full transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Interactive Data Grid Container -->
+            <div class="glass-card rounded-[3rem] overflow-hidden animate-slide-up" style="animation-delay: 0.3s;">
+                <div class="overflow-x-auto min-h-[600px]">
+                    <table class="w-full text-left border-collapse">
+                        <thead id="tableHead" class="data-grid-header">
+                            <!-- Headers will be injected here -->
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50">
+                            <!-- Data injected here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination Footer -->
+                <div class="px-10 py-6 bg-slate-50/50 dark:bg-slate-900/20 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Showing <span id="pageRange">0-0</span> of <span id="totalItems">0</span> results</p>
+                    <div class="flex items-center space-x-2">
+                        <button class="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all text-slate-400 disabled:opacity-30" disabled>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <div class="flex space-x-1">
+                            <button class="w-10 h-10 bg-blue-600 text-white rounded-xl text-xs font-black">1</button>
+                        </div>
+                        <button class="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all text-slate-400 disabled:opacity-30" disabled>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="components.js"></script>
+    <script>
+        let allRecords = [];
+        let filteredRecords = [];
+        let currentColumns = [];
+        let selectedIds = new Set();
+        let sortConfig = { key: null, direction: 'asc' };
+
+        // Initialize UI
+        async function loadAttendanceData() {
+            const tableBody = document.getElementById('tableBody');
+            
+            // Show advanced skeleton loader
+            tableBody.innerHTML = Array(8).fill(0).map(() => `
+                <tr class="animate-pulse">
+                    <td class="px-8 py-6"><div class="h-4 w-4 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                    <td class="px-8 py-6"><div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded-full"></div></td>
+                    <td class="px-8 py-6"><div class="h-4 w-48 bg-slate-100 dark:bg-slate-800 rounded-full opacity-60"></div></td>
+                    <td class="px-8 py-6"><div class="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded-full"></div></td>
+                    <td class="px-8 py-6"><div class="h-6 w-20 bg-slate-100 dark:bg-slate-800 rounded-full"></div></td>
+                </tr>
+            `).join('');
+
+            try {
+                const response = await getFullSheetData("Attendance Form");
+                if (!response || response.status === "error") throw new Error("Connection failed.");
+
+                currentColumns = response.headers;
+                allRecords = response.data.map((r, i) => ({ ...r, _id: i })); // Add internal ID
+                filteredRecords = [...allRecords];
+
+                updateStats();
+                await populateEventFilter(allRecords);
+                renderTable();
+
+            } catch (error) {
+                console.error(error);
+                NotificationSystem.show(error.message, "error");
+            }
+        }
+
+        function updateStats(rows) {
+            const targetRows = rows || allRecords;
+            const today = new Date().toLocaleDateString();
+            
+            const total = targetRows.length;
+            const presence = targetRows.filter(r => new Date(r.Timestamp).toLocaleDateString() === today).length;
+            const late = targetRows.filter(r => {
+                const status = (r.Status || "").toLowerCase();
+                return status === 'late';
+            }).length;
+            const absent = targetRows.filter(r => {
+                const status = (r.Status || "").toLowerCase();
+                return status === 'absent';
+            }).length;
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statToday').innerText = presence;
+            document.getElementById('statLate').innerText = late;
+            document.getElementById('statAbsent').innerText = absent;
+        }
+
+        async function populateEventFilter(rows) {
+            const filter = document.getElementById('eventFilter');
+            const metadata = await getSheetMetadata();
+            let events = [];
+
+            // Helper to find a value in a row regardless of header case
+            const getVal = (row, targetHeader) => {
+                const key = Object.keys(row).find(k => k.toLowerCase() === targetHeader.toLowerCase());
+                return key ? row[key] : null;
+            };
+
+            // Helper to check if a string is a date
+            const isDate = (val) => {
+                if (!val || typeof val !== 'string') return false;
+                // Check for ISO format or common date patterns
+                return !isNaN(Date.parse(val)) && (val.includes('T') || val.includes('-') || val.includes('/'));
+            };
+
+            if (metadata && metadata["Events"]) {
+                const eventData = await getFullSheetData("Events");
+                if (eventData && eventData.data) {
+                    events = eventData.data.map(r => {
+                        // Priority: Description/Title, Event Name, Description
+                        const title = getVal(r, "Description/Title") || getVal(r, "Event Name") || getVal(r, "Description");
+                        if (title && !isDate(title)) return title;
+                        
+                        // Fallback: Pick the first column that isn't ID or Date
+                        const fallbackKey = Object.keys(r).find(k => {
+                            const lowK = k.toLowerCase();
+                            const val = r[k];
+                            return !lowK.includes('id') && !lowK.includes('date') && !lowK.includes('timestamp') && !isDate(val);
+                        });
+                        return fallbackKey ? r[fallbackKey] : null;
+                    }).filter(Boolean);
+                }
+            }
+
+            if (events.length === 0) {
+                events = [...new Set(rows.map(r => {
+                    const title = getVal(r, "Description/Title") || getVal(r, "Event Name") || getVal(r, "Description") || getVal(r, "Event");
+                    if (title && !isDate(title)) return title;
+                    
+                    const fallbackKey = Object.keys(r).find(k => {
+                        const lowK = k.toLowerCase();
+                        const val = r[k];
+                        return !lowK.includes('id') && !lowK.includes('date') && !lowK.includes('timestamp') && !isDate(val);
+                    });
+                    return fallbackKey ? r[fallbackKey] : null;
+                }).filter(Boolean))];
+            }
+
+            filter.innerHTML = '<option value="all">ALL EVENTS</option>' + 
+                [...new Set(events)].sort().map(e => `<option value="${e}">${e.toUpperCase()}</option>`).join('');
+        }
+
+        function renderTable() {
+            const tableHead = document.getElementById('tableHead');
+            const tableBody = document.getElementById('tableBody');
+            
+            // Fixed Column Widths for Controls
+            const ctrlColWidth = 'w-16'; // For expand and checkbox
+
+            // Enhanced Header with Sorting
+            tableHead.innerHTML = `
+                <tr class="bg-slate-50/50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
+                    <th class="px-6 py-5 ${ctrlColWidth} text-center"></th>
+                    <th class="px-6 py-5 ${ctrlColWidth} text-center">
+                        <input type="checkbox" onchange="toggleAllRows(this)" class="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer">
+                    </th>
+                    ${currentColumns.map(col => `
+                        <th onclick="handleSort('${col}')" class="px-6 py-5 text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.25em] cursor-pointer group/th whitespace-nowrap">
+                            <div class="flex items-center space-x-2">
+                                <span>${col.replace(/_/g, ' ')}</span>
+                                <svg class="w-3 h-3 opacity-0 group-hover/th:opacity-100 transition-opacity ${sortConfig.key === col ? 'opacity-100 text-blue-500' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="${sortConfig.key === col && sortConfig.direction === 'desc' ? 'M19 9l-7 7-7-7' : 'M5 15l7-7 7 7'}"></path>
+                                </svg>
+                            </div>
+                        </th>
+                    `).join('')}
+                    <th class="px-8 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] w-24">Actions</th>
+                </tr>
+            `;
+
+            if (filteredRecords.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="100%" class="py-32 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">No records found matching filters</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = filteredRecords.map((row, index) => {
+                const isSelected = selectedIds.has(row._id);
+                return `
+                    <tr id="row-${row._id}" class="group hover:bg-blue-50/30 dark:hover:bg-blue-600/5 transition-all duration-300 cursor-pointer ${isSelected ? 'bg-blue-50/50 dark:bg-blue-600/10' : ''}" onclick="toggleRowSelection(${row._id})">
+                        <td class="px-6 py-4 ${ctrlColWidth} text-center" onclick="event.stopPropagation(); toggleRowDetails(${row._id})">
+                            <button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-transform duration-300" id="btn-${row._id}">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </td>
+                        <td class="px-6 py-4 ${ctrlColWidth} text-center" onclick="event.stopPropagation()">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleRowSelection(${row._id})" class="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer">
+                        </td>
+                        ${currentColumns.map(col => renderCell(row, col)).join('')}
+                        <td class="px-8 py-4 text-right w-24" onclick="event.stopPropagation()">
+                            <button class="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all text-slate-400 hover:text-blue-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr id="details-${row._id}" class="hidden bg-slate-50/30 dark:bg-slate-900/30">
+                        <td colspan="100%" class="px-24 py-10">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-16 animate-slide-up">
+                                <div class="space-y-6">
+                                    <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Profile Metadata</p>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-400 uppercase">Check-in Time</span><span class="text-xs font-black text-slate-900 dark:text-white">${new Date(row.Timestamp).toLocaleString()}</span></div>
+                                        <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-400 uppercase">System Hash</span><span class="text-[10px] font-black text-blue-600 dark:text-blue-400">#${row._id}00X</span></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-6">
+                                    <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Raw Entry Data</p>
+                                    <pre class="text-[10px] font-medium text-slate-500 bg-white dark:bg-slate-950 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-x-auto shadow-inner">${JSON.stringify(row, null, 2)}</pre>
+                                </div>
+                                <div class="space-y-6">
+                                    <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Digital Signature</p>
+                                    ${row.Signature ? `<div class="p-4 bg-white rounded-3xl border-2 border-slate-100 shadow-sm inline-block"><img src="${row.Signature}" class="h-24 w-auto object-contain"></div>` : '<p class="text-xs italic text-slate-400">No signature provided</p>'}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('totalItems').innerText = filteredRecords.length;
+            document.getElementById('pageRange').innerText = filteredRecords.length > 0 ? `1-${filteredRecords.length}` : '0-0';
+        }
+
+        function toggleRowDetails(id) {
+            const detailsRow = document.getElementById(`details-${id}`);
+            const btn = document.getElementById(`btn-${id}`);
+            const isHidden = detailsRow.classList.contains('hidden');
+            
+            // Close all other details
+            document.querySelectorAll('[id^="details-"]').forEach(el => {
+                if(el.id !== `details-${id}`) el.classList.add('hidden');
+            });
+            document.querySelectorAll('[id^="btn-"]').forEach(el => {
+                if(el.id !== `btn-${id}`) el.querySelector('svg').classList.remove('rotate-90');
+            });
+
+            if (isHidden) {
+                detailsRow.classList.remove('hidden');
+                btn.querySelector('svg').classList.add('rotate-90');
+            } else {
+                detailsRow.classList.add('hidden');
+                btn.querySelector('svg').classList.remove('rotate-90');
+            }
+        }
+
+        function renderCell(row, col) {
+            const val = row[col] || "";
+            const lowCol = col.toLowerCase();
+            
+            // Signature
+            if (lowCol.includes('signature') && val.startsWith('data:image')) {
+                return `<td class="px-6 py-4"><img src="${val}" class="h-8 w-auto bg-white rounded border border-slate-200 p-0.5"></td>`;
+            }
+            
+            // Status Badge
+            if (lowCol === 'status') {
+                const s = val.toLowerCase();
+                let cls = 'bg-slate-100 text-slate-500';
+                if (s === 'present') cls = 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400';
+                if (s === 'late') cls = 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400';
+                if (s === 'absent') cls = 'bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400';
+                return `<td class="px-6 py-4"><span class="status-badge ${cls}">${val}</span></td>`;
+            }
+
+            // Email/Primary info
+            if (lowCol.includes('email') || lowCol.includes('name')) {
+                return `<td class="px-6 py-4 text-xs font-black text-slate-900 dark:text-white">${val}</td>`;
+            }
+
+            return `<td class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400">${val}</td>`;
+        }
+
+        // Filter Logic
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const event = document.getElementById('eventFilter').value;
+            const from = document.getElementById('dateFrom').value;
+            const to = document.getElementById('dateTo').value;
+
+            // Helper to find a value in a row regardless of header case
+            const getVal = (row, targetHeader) => {
+                const key = Object.keys(row).find(k => k.toLowerCase() === targetHeader.toLowerCase());
+                return key ? row[key] : null;
+            };
+
+            filteredRecords = allRecords.filter(r => {
+                const matchesSearch = Object.values(r).some(v => String(v).toLowerCase().includes(search));
+                
+                // Helper to check if a string is a date
+                const isDate = (val) => {
+                    if (!val || typeof val !== 'string') return false;
+                    return !isNaN(Date.parse(val)) && (val.includes('T') || val.includes('-') || val.includes('/'));
+                };
+
+                const getRowEvent = () => {
+                    const title = getVal(r, "Description/Title") || getVal(r, "Event Name") || getVal(r, "Description") || getVal(r, "Event");
+                    if (title && !isDate(title)) return title;
+                    
+                    const fallbackKey = Object.keys(r).find(k => {
+                        const lowK = k.toLowerCase();
+                        const val = r[k];
+                        return !lowK.includes('id') && !lowK.includes('date') && !lowK.includes('timestamp') && !isDate(val);
+                    });
+                    return fallbackKey ? r[fallbackKey] : null;
+                };
+
+                const rowEvent = getRowEvent();
+                const matchesEvent = event === 'all' || rowEvent === event;
+                
+                let matchesDate = true;
+                if (from || to) {
+                    const rDate = new Date(r.Timestamp).getTime();
+                    if (from) matchesDate = matchesDate && rDate >= new Date(from).getTime();
+                    if (to) matchesDate = matchesDate && rDate <= new Date(to).getTime();
+                }
+
+                return matchesSearch && matchesEvent && matchesDate;
+            });
+
+            updateStats(filteredRecords);
+            renderTable();
+        }
+
+        // Event Listeners
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('eventFilter').addEventListener('change', applyFilters);
+        document.getElementById('dateFrom').addEventListener('change', applyFilters);
+        document.getElementById('dateTo').addEventListener('change', applyFilters);
+
+        // Selection Management
+        function toggleRowSelection(id) {
+            if (selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
+            updateBulkToolbar();
+            renderTable();
+        }
+
+        function toggleAllRows(checkbox) {
+            if (checkbox.checked) filteredRecords.forEach(r => selectedIds.add(r._id));
+            else selectedIds.clear();
+            updateBulkToolbar();
+            renderTable();
+        }
+
+        function updateBulkToolbar() {
+            const toolbar = document.getElementById('bulkToolbar');
+            const count = document.getElementById('selectedCount');
+            if (selectedIds.size > 0) {
+                toolbar.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+                count.innerText = selectedIds.size;
+            } else {
+                toolbar.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function deselectAll() {
+            selectedIds.clear();
+            updateBulkToolbar();
+            renderTable();
+        }
+
+        function handleSort(key) {
+            if (sortConfig.key === key) {
+                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortConfig.key = key;
+                sortConfig.direction = 'asc';
+            }
+
+            filteredRecords.sort((a, b) => {
+                let valA = a[key] || '';
+                let valB = b[key] || '';
+                if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderTable();
+        }
+
+        document.getElementById('refreshBtn').addEventListener('click', loadAttendanceData);
+        window.addEventListener('DOMContentLoaded', loadAttendanceData);
+    </script>
+</body>
+</html>
