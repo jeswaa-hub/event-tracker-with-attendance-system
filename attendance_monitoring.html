@@ -177,7 +177,7 @@
                 <div class="flex items-center gap-3 flex-wrap">
                     <!-- Event Filter -->
                     <div class="relative group">
-                        <select id="eventFilter" class="appearance-none bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 pr-12 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer">
+                        <select id="eventFilter" class="appearance-none bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 pr-12 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer">
                             <option value="all">All Events</option>
                         </select>
                         <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
@@ -185,18 +185,21 @@
                         </div>
                     </div>
 
+                    <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4">
+                        <input type="month" id="monthFilter" class="bg-transparent border-none text-xs font-bold focus:ring-0">
+                    </div>
+
                     <!-- Date Range Filter (Native Placeholder) -->
-                    <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2">
+                    <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4">
                         <input type="date" id="dateFrom" class="bg-transparent border-none text-xs font-bold focus:ring-0">
                         <span class="text-slate-400 text-xs">to</span>
                         <input type="date" id="dateTo" class="bg-transparent border-none text-xs font-bold focus:ring-0">
                     </div>
-
-                    <button id="refreshBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-4 px-8 rounded-2xl transition-all shadow-xl shadow-blue-500/20 active:scale-95 flex items-center space-x-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        <span>Sync</span>
-                    </button>
                 </div>
+
+                <button id="refreshBtn" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-4 px-8 rounded-2xl transition-all shadow-xl shadow-blue-500/20 active:scale-95 flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
             </div>
 
             <!-- Bulk Actions Toolbar (Hidden by default) -->
@@ -408,6 +411,13 @@
 
             filter.innerHTML = '<option value="all">ALL EVENTS</option>' + 
                 unique.map(e => `<option value="${e}">${e.toUpperCase()}</option>`).join('');
+
+            // Reduce dropdown width after data is loaded
+            try {
+                filter.style.width = 'auto';
+                filter.style.minWidth = '10rem';
+                filter.style.maxWidth = '10rem';
+            } catch (_) {}
         }
 
         function renderTable() {
@@ -547,6 +557,7 @@
             const event = document.getElementById('eventFilter').value;
             const from = document.getElementById('dateFrom').value;
             const to = document.getElementById('dateTo').value;
+            const monthVal = document.getElementById('monthFilter').value;
 
             // Helper to find a value in a row regardless of header case
             const getVal = (row, targetHeader) => {
@@ -579,7 +590,13 @@
                 const matchesEvent = event === 'all' || rowEvent === event;
                 
                 let matchesDate = true;
-                if (from || to) {
+                if (monthVal) {
+                    const [yearStr, monthStr] = monthVal.split('-');
+                    const y = parseInt(yearStr, 10);
+                    const m = parseInt(monthStr, 10) - 1;
+                    const d = new Date(r.Timestamp);
+                    matchesDate = !Number.isNaN(d.getTime()) && d.getFullYear() === y && d.getMonth() === m;
+                } else if (from || to) {
                     const rDate = new Date(r.Timestamp).getTime();
                     if (from) matchesDate = matchesDate && rDate >= new Date(from).getTime();
                     if (to) matchesDate = matchesDate && rDate <= new Date(to).getTime();
@@ -597,6 +614,7 @@
         document.getElementById('eventFilter').addEventListener('change', applyFilters);
         document.getElementById('dateFrom').addEventListener('change', applyFilters);
         document.getElementById('dateTo').addEventListener('change', applyFilters);
+        document.getElementById('monthFilter').addEventListener('change', applyFilters);
 
         // Selection Management
         function toggleRowSelection(id) {

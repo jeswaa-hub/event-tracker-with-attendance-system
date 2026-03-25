@@ -35,11 +35,13 @@
                     <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Event Monitoring</h1>
                     <p class="text-sm font-bold text-slate-500">Manage and track your active events</p>
                 </div>
-                
-                <button id="addEventBtn" class="bg-[#155DFC] hover:bg-[#1048c7] text-white text-[10px] font-bold py-4 px-10 rounded-2xl transition-all duration-300 shadow-2xl shadow-blue-500/20 active:scale-95 flex items-center space-x-3">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                    <span>Create New Event</span>
-                </button>
+                <div class="flex items-center gap-3">
+                    <input type="month" id="eventsMonthFilter" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all" />
+                    <button id="addEventBtn" class="bg-[#155DFC] hover:bg-[#1048c7] text-white text-[10px] font-bold py-4 px-10 rounded-2xl transition-all duration-300 shadow-2xl shadow-blue-500/20 active:scale-95 flex items-center space-x-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Create New Event</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Events Table -->
@@ -465,6 +467,29 @@
             return 'bg-slate-50 text-slate-400';
         }
 
+        function applyEventFilters() {
+            const monthVal = document.getElementById('eventsMonthFilter')?.value || '';
+            if (!monthVal) {
+                renderEvents(allEvents);
+                return;
+            }
+            const [yearStr, monthStr] = monthVal.split('-');
+            const y = parseInt(yearStr, 10);
+            const m = parseInt(monthStr, 10) - 1;
+            const dateCol = eventSchema.find(c => c.toLowerCase().includes('date'));
+            if (!dateCol) {
+                renderEvents(allEvents);
+                return;
+            }
+            const filtered = allEvents.filter(ev => {
+                const val = ev[dateCol];
+                const d = new Date(val);
+                if (Number.isNaN(d.getTime())) return false;
+                return d.getFullYear() === y && d.getMonth() === m;
+            });
+            renderEvents(filtered);
+        }
+
         createForm.onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveEventBtn');
@@ -571,6 +596,7 @@
             if (e.target === deleteModal) closeDeleteModal();
         };
 
+        document.getElementById('eventsMonthFilter').addEventListener('change', applyEventFilters);
         window.addEventListener('DOMContentLoaded', loadEvents);
     </script>
 </body>

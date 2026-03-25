@@ -79,6 +79,10 @@
                     </div>
                 </div>
 
+                <div class="relative">
+                    <input type="month" id="monthSelector" class="pl-4 pr-4 py-3 bg-slate-100/50 border border-slate-200/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0061FF]/10 focus:border-[#0061FF] transition-all text-sm font-semibold text-slate-700 shadow-sm" />
+                </div>
+
                 <div class="relative flex-grow md:flex-grow-0">
                     <input type="text" placeholder="Search data..." class="w-full md:w-60 pl-11 pr-4 py-3 bg-slate-100/50 border border-slate-200/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0061FF]/10 focus:border-[#0061FF] transition-all text-sm font-medium text-slate-700 shadow-sm placeholder-slate-400">
                     <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -467,32 +471,37 @@
             });
         }
 
-        // Handle event selection change
-        document.getElementById('eventSelector').addEventListener('change', function() {
-            const selectedEvent = this.value;
-            console.log("Event selector changed to:", selectedEvent);
-            
-            let filteredRows = attendanceData;
-            
+        function applyDashboardFilters() {
+            const selectedEvent = document.getElementById('eventSelector').value;
+            const monthVal = document.getElementById('monthSelector')?.value || '';
+            let rows = attendanceData;
             if (selectedEvent !== 'all') {
                 const target = normalizeText(selectedEvent);
-
-                filteredRows = attendanceData.filter(r => {
+                rows = rows.filter(r => {
                     const rowEvent = normalizeText(getAttendanceEventName(r));
                     return rowEvent === target;
                 });
             }
-
-            console.log(`Filtered Result: ${filteredRows.length} matches for "${selectedEvent}"`);
-            refreshDashboardUI(filteredRows);
-            
-            if (selectedEvent !== 'all') {
-                if (filteredRows.length === 0) {
-                    NotificationSystem.show(`Walang nahanap na data para sa "${selectedEvent}"`, "warning");
-                } else {
-                    NotificationSystem.show(`Found ${filteredRows.length} records`, "success");
-                }
+            if (monthVal) {
+                const [yearStr, monthStr] = monthVal.split('-');
+                const y = parseInt(yearStr, 10);
+                const m = parseInt(monthStr, 10) - 1;
+                rows = rows.filter(r => {
+                    const ts = getRowVal(r, "Timestamp");
+                    if (!ts) return false;
+                    const d = new Date(ts);
+                    if (Number.isNaN(d.getTime())) return false;
+                    return d.getFullYear() === y && d.getMonth() === m;
+                });
             }
+            refreshDashboardUI(rows);
+        }
+
+        document.getElementById('eventSelector').addEventListener('change', function() {
+            applyDashboardFilters();
+        });
+        document.getElementById('monthSelector').addEventListener('change', function() {
+            applyDashboardFilters();
         });
 
         function updateCharts(rows) {
